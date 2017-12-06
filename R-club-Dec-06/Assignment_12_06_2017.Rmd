@@ -8,6 +8,7 @@ output: html_document
 ```{r}
 library(tidyverse)
 library(ISLR)
+library(MASS)
 ```
 
 ### 8 
@@ -104,7 +105,7 @@ summary(lm(Y ~ x^2 + x))
 
 (h) Repeat (a)–(f) after modifying the data generation process in such a way that there is less noise in the data. The model (3.39) should remain the same. You can do this by decreasing the variance of the normal distribution used to generate the error term ε in (b). Describe your results.
 ```{r}
-set.seed(1)
+set.seed(2)
 eps2 <- rnorm(100, 0, 0.15)
 Y = 1 + 0.5*x + eps2
 length(Y)
@@ -120,7 +121,7 @@ abline(fit.m4, col = "red")
 
 (i) Repeat (a)–(f) after modifying the data generation process in such a way that there is more noise in the data. The model (3.39) should remain the same. You can do this by increasing the variance of the normal distribution used to generate the error term ε in (b). Describe your results.
 ```{r}
-set.seed(1)
+set.seed(3)
 eps3 <- rnorm(100, 0, 0.35)
 Y = 1 + 0.5*x + eps3
 length(Y)
@@ -152,8 +153,8 @@ colnames(Boston)
 # "ptratio" "black"   "lstat"   "medv"
 
 fit.m6 <- 
-lapply(colnames(Boston)[-1], function(i){
- lm(crim ~ Boston[,i])
+lapply(colnames(Boston)[-1], function(i){ 
+ lm(Boston$crim ~ Boston[,i]) 
 })
 
 names(fit.m6) <- colnames(Boston)[-1]
