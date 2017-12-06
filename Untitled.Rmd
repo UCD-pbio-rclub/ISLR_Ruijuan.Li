@@ -1,0 +1,46 @@
+---
+title: "R_club"
+author: "Ruijuan Li"
+date: "12/6/2017"
+output: html_document
+---
+
+### Lab
+
+12-06-2017 
+### Linear regression 
+```{r}
+library(MASS)
+library(ISLR)
+
+# simple linear regression 
+# fix(Boston)
+names(Boston)
+?Boston
+
+lm.fit = lm(medv ~ lstat, data = Boston)
+lm.fit
+summary(lm.fit)
+
+names(lm.fit)
+coef(lm.fit)
+
+confint(lm.fit)
+
+predict(lm.fit,data.frame(lstat=c(5,10,15)), interval ="confidence")
+predict(lm.fit,data.frame(lstat=c(5,10,15)), interval ="prediction") # difference between these two 
+
+attach(Boston)
+plot(lstat, medv)
+abline(lm.fit)
+
+par(mfrow=c(2,2))
+plot(lm.fit)
+
+plot(predict(lm.fit), residuals(lm.fit)) # residule 
+plot(predict(lm.fit), rstudent(lm.fit)) # studendized residual, what is this? 
+
+plot(hatvalues (lm.fit)) # what???? 
+which.max(hatvalues (lm.fit))
+```
+
