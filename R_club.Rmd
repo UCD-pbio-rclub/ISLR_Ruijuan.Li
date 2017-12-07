@@ -42,5 +42,6 @@ plot(predict(lm.fit), rstudent(lm.fit)) # studendized residual, what is this?
 
 plot(hatvalues (lm.fit)) # what???? 
 which.max(hatvalues (lm.fit))
+# prediction interval VS confidence interval 
 ```
 

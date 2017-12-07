@@ -162,6 +162,8 @@ predict(fit.m1,data.frame(horsepower=c(98)), interval ="prediction")
 ```
 
 ```r
+## confidence interval VS prediction interval 
+
 # How do these two intervals differ and why?
 # the predicted value for these two are the same but the intervals for predicted value for new individuals are much bigger, because it includes the random variability around the mean.  
 ```
@@ -186,6 +188,8 @@ plot(fit.m1) # residual is biased, non equal variance; nonnormality of vairance
 ![](Assignment_12_06_2017_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 ```r
+### the plots indicate a not very good fit, and transformation might help 
+
 # plot(fit.m1$fitted.values, fit.m1$residuals) > abline(0,0) # abline(0, 0) slope of 0 and intercept of 0 as ref line, seems like there is equal variance assumption 
 # qqnorm(fit.m1$residuals)
 # qqline(fit.m1$residuals) # seems there is normality assumption  
@@ -204,7 +208,7 @@ x <- rnorm(100, 0, 1) # mean of 0, stdv of 1
 (b) Using the rnorm() function, create a vector, eps, containing 100 observations drawn from a N(0,0.25) distribution i.e. a normal distribution with mean zero and variance 0.25.
 
 ```r
-eps <- rnorm(100, 0, 0.25)
+eps <- rnorm(100, 0, 0.25) # what is this??? 
 ```
 
 (c) Using x and eps, generate a vector y according to the model
@@ -277,7 +281,7 @@ abline(fit.m2, col = "red")
 (g) Now fit a polynomial regression model that predicts y using x and x2. Is there evidence that the quadratic term improves the model fit? Explain your answer.
 
 ```r
-fit.m3 <- lm(Y ~ x^2) # not sure he is asking for this
+fit.m3 <- lm(Y ~ x^2) # not sure he is asking for this, differnet notation should be used here 
 summary(fit.m3)
 ```
 
@@ -360,7 +364,7 @@ summary(lm(Y ~ x^2 + x))
 
 ```r
 set.seed(2)
-eps2 <- rnorm(100, 0, 0.15)
+eps2 <- rnorm(100, 0, 0.15) # eps is the non reduced error? 
 Y = 1 + 0.5*x + eps2
 length(Y)
 ```
@@ -375,7 +379,7 @@ par(mfrow=c(1,1))
 plot(x, Y)
 # a positive linear relationship 
 fit.m4 <- lm(Y ~ x)
-summary(fit.m4) # b0^ and b1^ are closer to b0 and b1
+summary(fit.m4) # b0^ and b1^ are closer to b0 and b1 
 ```
 
 ```
@@ -567,7 +571,7 @@ summary(fit.m6[["indus"]])
 
 ```r
 for(i in colnames(Boston)[-1]){
-  plot(Boston[,i], Boston$crim, xlab = i)
+  plot(Boston[,i], Boston$crim, main = i, xlab = round(cor(Boston$crim, Boston[,i]), 2))
 }
 ```
 
