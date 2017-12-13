@@ -231,7 +231,8 @@ summary(fit.m2)
 # USYes, the expected mean change in sales is 1.2 unit when the car store is located in the US, with a fixed price and Urbanstatus, and this relationship is statistically significant. 
 
 # c) 
-
+# Sales = a + b1* Price + b2*UrbanYes + b3*USYes 
+  
 # d) for price and US, and I reject the null hypothesis 
 
 # e) 
