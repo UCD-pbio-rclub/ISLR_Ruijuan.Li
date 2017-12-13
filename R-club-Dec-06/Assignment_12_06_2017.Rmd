@@ -159,13 +159,13 @@ colnames(Boston)
 # "ptratio" "black"   "lstat"   "medv"
 
 fit.m6 <- 
-lapply(colnames(Boston)[-1], function(i){ 
- lm(Boston$crim ~ Boston[,i]) 
-})
+lapply(colnames(Boston)[-1], function(i){  
+ model <- lm(Boston$crim ~ Boston[,i])  
+ summary(model)
+}) 
 
 names(fit.m6) <- colnames(Boston)[-1]
-summary(fit.m6[["zn"]])
-summary(fit.m6[["indus"]])
+fit.m6
 
 for(i in colnames(Boston)[-1]){
   plot(Boston[,i], Boston$crim, main = i, xlab = round(cor(Boston$crim, Boston[,i]), 2))

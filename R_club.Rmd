@@ -45,3 +45,31 @@ which.max(hatvalues (lm.fit))
 # prediction interval VS confidence interval 
 ```
 
+### 12-13-2017 Multiple linear regression 
+Q I have when reading 
+1) for multiple regression, what if there is repulsive interaction effect, then those predictor will not be identified, compare to scanone  CIM  and scantwo 
+2) genomic prediction remove highly correlated markers similar to here
+3) what is q in page 76 underlined part don't understand 
+4) I like the confidence interval and prediction interval explanation part 
+```{r}
+library(MASS)
+library(ISLR)
+lm.fit <- lm(medv ~ lstat + age, data = Boston)
+summary(lm.fit)
+
+# regression using all variable 
+lm.fit <- lm(medv ~ ., data = Boston)
+summary(lm.fit)
+
+library(car)
+vif(lm.fit) # don't understand ... 
+?vif # variance inflation factor 
+
+# regression using all but one variable 
+lm.fit1 <- lm(medv ~ .-age, data = Boston)
+summary(lm.fit1)
+
+# or use update to update the variable 
+lm.fit1 <- update(lm.fit, ~.-age) 
+```
+

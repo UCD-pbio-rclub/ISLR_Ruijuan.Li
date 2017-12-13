@@ -1,0 +1,124 @@
+---
+title: "Assignment_12_12_2017"
+author: "Ruijuan Li"
+date: "12/12/2017"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+1. Describe the null hypotheses to which the p-values given in Table 3.4 correspond. Explain what conclusions you can draw based on these p-values. Your explanation should be phrased in terms of sales, TV, radio, and newspaper, rather than in terms of the coefficients of the linear model.
+
+For a given amount of radio and newspaper advitising, spending an additional $1000 on TV advertising leads to an increase in sales by approximately 46 units. 
+
+For a given amount of TV and newspaper advitising, spending an additional $1000 on radio advertising leads to an increase in sales by approximately 189 units. 
+
+9. This question involves the use of multiple linear regression on the Auto data set.
+
+(a) Produce a scatterplot matrix which includes all of the variables in the data set.
+
+(b) Compute the matrix of correlations between the variables using the function cor(). You will need to exclude the name variable, which is qualitative.
+
+```{r}
+library(tidyverse)
+library(MASS)
+library(ISLR)
+library(GGally)
+library(modelr)
+
+ggpairs(Auto[,c(1:7)]) 
+pairs(Auto)
+```
+
+(c) Use the lm() function to perform a multiple linear regression with mpg as the response and all other variables except name as the predictors. Use the summary() function to print the results. Comment on the output. For instance: 
+
+```{r}
+fit.m1 <- lm(mpg ~ .-name, data = Auto)
+summary(fit.m1) 
+```
+
+i. Is there a relationship between the predictors and the response?
+
+ii. Which predictors appear to have a statistically significant relationship to the response?
+
+iii. What does the coefficient for the year variable suggest?
+
+For displacement, weight, year, and origin, yes, there is significant relationship to the response. 
+
+When all the other predictors are fixed, one unit increase in model year lead to an increase in mpg by approximately 0.75 units. 
+
+10. This question should be answered using the Carseats data set.
+
+(a) Fit a multiple regression model to predict Sales using Price,
+Urban, and US.
+
+(b) Provide an interpretation of each coefficient in the model. Be
+careful—some of the variables in the model are qualitative!
+
+(c) Write out the model in equation form, being careful to handle the qualitative variables properly.
+
+(d) For which of the predictors can you reject the null hypothesis H0 :βj =0?
+
+(e) On the basis of your response to the previous question, fit a smaller model that only uses the predictors for which there is evidence of association with the outcome.
+
+(f) How well do the models in (a) and (e) fit the data?
+
+(g) Using the model from (e), obtain 95% confidence intervals for the coefficient(s).
+
+(h) Is there evidence of outliers or high leverage observations in the model from (e)?
+
+```{r}
+# a) 
+fit.m2 <- lm(Sales ~ Price + Urban + US, data = Carseats)
+
+# b) 
+summary(fit.m2)
+# Price: the expected mean change in sales is -50 when price goes up $1000, when urban status and US status are held constant, and this relationship is statistically significant.   
+# UrbanYes, the expected mean change in sales is -0.02 unit when the the car store is located in an urban area, when price and USyes status are fixed, however this relationship is not statistically significant. 
+# USYes, the expected mean change in sales is 1.2 unit when the car store is located in the US, with a fixed price and Urbanstatus, and this relationship is statistically significant. 
+
+# c) 
+
+# d) for price and US, and I reject the null hypothesis 
+
+# e) 
+fit.m3 <- lm(Sales ~ Price + US, data = Carseats)
+
+# f) 
+summary(fit.m3) # 23.54% variance explained 
+summary(fit.m2) # 23.35% variance explained, slightly decrease in R squared 
+anova(fit.m2, fit.m3) # adding Urban does not improve the model fit
+
+# RSE, how? 
+Carseats %>% 
+  add_residuals(fit.m3, "residual") %>% 
+  ggplot(aes(Price, residual)) + 
+  geom_point() + 
+  geom_ref_line(h = 0, colour = "red")
+
+# g) 
+confint(fit.m3, level = 0.95)
+```
+
+15. This problem involves the Boston data set, which we saw in the lab for this chapter. We will now try to predict per capita crime rate using the other variables in this data set. In other words, per capita crime rate is the response, and the other variables are the predictors.
+
+(b) Fit a multiple regression model to predict the response using all of the predictors. Describe your results. For which predictors can we reject the null hypothesis H0 : βj = 0?
+
+(c) How do your results from (a) compare to your results from (b)? Create a plot displaying the univariate regression coefficients from (a) on the x-axis, and the multiple regression coefficients from 
+(b) on the y-axis. That is, each predictor is displayed as a single point in the plot. Its coefficient in a simple linear regres- sion model is shown on the x-axis, and its coefficient estimate in the multiple linear regression model is shown on the y-axis.
+
+(d) Is there evidence of non-linear association between any of the predictors and the response? To answer this question, for each predictor X, fit a model of the form
+Y = β0 +β1X +β2X2 +β3X3 +ε. 
+
+```{r}
+# b) 
+fit.m4 <- lm(crim ~ ., data = Boston)
+summary(fit.m4) # we can reject those with P-value < 0.05 
+
+# c) 
+https://github.com/UCD-pbio-rclub/ISLR_Ruijuan.Li/blob/master/R-club-Dec-06/Assignment_12_06_2017.md 
+
+
+
+```
+
