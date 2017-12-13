@@ -9,10 +9,7 @@ output:
 
 1. Describe the null hypotheses to which the p-values given in Table 3.4 correspond. Explain what conclusions you can draw based on these p-values. Your explanation should be phrased in terms of sales, TV, radio, and newspaper, rather than in terms of the coefficients of the linear model.
 
-
-```r
-# ![Table 3.4](https://github.com/UCD-pbio-rclub/ISLR_Ruijuan.Li/blob/master/R-club-Dec-13/f1.png) 
-```
+![Table 3.4](https://github.com/UCD-pbio-rclub/ISLR_Ruijuan.Li/blob/master/R-club-Dec-13/f1.png) 
 
 For a given amount of radio and newspaper advitising, spending an additional $1000 on TV advertising leads to an increase in sales by approximately 46 units. 
 
@@ -129,7 +126,7 @@ library(modelr)
 ggpairs(Auto[,c(1:7)])  
 ```
 
-![](Assignment_12_13_2017_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+![](Assignment_12_13_2017_files/figure-html/unnamed-chunk-1-1.png)<!-- -->
 
 (c) Use the lm() function to perform a multiple linear regression with mpg as the response and all other variables except name as the predictors. Use the summary() function to print the results. Comment on the output. For instance: 
 
@@ -316,7 +313,7 @@ Carseats %>%
   geom_ref_line(h = 0, colour = "red")
 ```
 
-![](Assignment_12_13_2017_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+![](Assignment_12_13_2017_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 ```r
 # g) 
@@ -411,7 +408,7 @@ data1 %>% ggplot() +
   theme(legend.position = "none") 
 ```
 
-![](Assignment_12_13_2017_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![](Assignment_12_13_2017_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 ```r
 # d) 

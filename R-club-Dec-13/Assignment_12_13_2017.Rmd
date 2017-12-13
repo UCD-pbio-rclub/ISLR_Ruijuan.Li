@@ -9,9 +9,7 @@ output:
 
 1. Describe the null hypotheses to which the p-values given in Table 3.4 correspond. Explain what conclusions you can draw based on these p-values. Your explanation should be phrased in terms of sales, TV, radio, and newspaper, rather than in terms of the coefficients of the linear model.
 
-```{r}
-# ![Table 3.4](https://github.com/UCD-pbio-rclub/ISLR_Ruijuan.Li/blob/master/R-club-Dec-13/f1.png) 
-```
+![Table 3.4](https://github.com/UCD-pbio-rclub/ISLR_Ruijuan.Li/blob/master/R-club-Dec-13/f1.png) 
 
 For a given amount of radio and newspaper advitising, spending an additional $1000 on TV advertising leads to an increase in sales by approximately 46 units. 
 
