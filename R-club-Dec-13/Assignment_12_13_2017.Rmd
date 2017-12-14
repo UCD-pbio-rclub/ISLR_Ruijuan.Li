@@ -79,7 +79,7 @@ summary(fit.m2)
 # USYes, the expected mean change in sales is 1.2 unit when the car store is located in the US, with a fixed price and Urbanstatus, and this relationship is statistically significant. 
 
 # c) 
-# Sales = a + b1* Price + b2*UrbanYes + b3*USYes 
+# Sales = a + b1* Price + b2*UrbanYes + b3*USYes + Error 
   
 # d) for price and US, and I reject the null hypothesis 
 
@@ -89,7 +89,8 @@ fit.m3 <- lm(Sales ~ Price + US, data = Carseats)
 # f) 
 summary(fit.m3) # 23.54% variance explained 
 summary(fit.m2) # 23.35% variance explained, slightly decrease in R squared 
-anova(fit.m2, fit.m3) # adding Urban does not improve the model fit
+anova(fit.m2, fit.m3) # adding Urban does not improve the model fit # compare the variance explained between the two model 
+### how to calculate F-statistics... 
 
 # RSE, how? 
 Carseats %>% 
@@ -99,7 +100,7 @@ Carseats %>%
   geom_ref_line(h = 0, colour = "red")
 
 # g) 
-confint(fit.m3, level = 0.95)
+confint(fit.m3, level = 0.95) 
 ```
 
 15. This problem involves the Boston data set, which we saw in the lab for this chapter. We will now try to predict per capita crime rate using the other variables in this data set. In other words, per capita crime rate is the response, and the other variables are the predictors.
@@ -132,7 +133,7 @@ data1 <- data.frame(coef_multiple = fit.m4$coefficients[-1],
                     predictor = colnames(Boston)[-1])
 
 library(ggrepel)
-set.seed(111)
+set.seed(111) 
 
 data1 %>% ggplot() + 
   geom_point(aes(x = coef_single, y = coef_multiple, color = predictor)) + 

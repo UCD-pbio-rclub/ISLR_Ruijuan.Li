@@ -231,7 +231,7 @@ summary(fit.m2)
 # USYes, the expected mean change in sales is 1.2 unit when the car store is located in the US, with a fixed price and Urbanstatus, and this relationship is statistically significant. 
 
 # c) 
-# Sales = a + b1* Price + b2*UrbanYes + b3*USYes 
+# Sales = a + b1* Price + b2*UrbanYes + b3*USYes + Error 
   
 # d) for price and US, and I reject the null hypothesis 
 
@@ -292,7 +292,7 @@ summary(fit.m2) # 23.35% variance explained, slightly decrease in R squared
 ```
 
 ```r
-anova(fit.m2, fit.m3) # adding Urban does not improve the model fit
+anova(fit.m2, fit.m3) # adding Urban does not improve the model fit # compare the variance explained between the two model 
 ```
 
 ```
@@ -306,6 +306,8 @@ anova(fit.m2, fit.m3) # adding Urban does not improve the model fit
 ```
 
 ```r
+### how to calculate F-statistics... 
+
 # RSE, how? 
 Carseats %>% 
   add_residuals(fit.m3, "residual") %>% 
@@ -318,7 +320,7 @@ Carseats %>%
 
 ```r
 # g) 
-confint(fit.m3, level = 0.95)
+confint(fit.m3, level = 0.95) 
 ```
 
 ```
