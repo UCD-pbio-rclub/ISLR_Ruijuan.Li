@@ -62,7 +62,7 @@ lm.fit <- lm(medv ~ ., data = Boston)
 summary(lm.fit)
 
 library(car)
-vif(lm.fit) # don't understand ... 
+vif(lm.fit) # don't understand ... look for colinearity problem 
 ?vif # variance inflation factor 
 
 # regression using all but one variable 
@@ -72,4 +72,31 @@ summary(lm.fit1)
 # or use update to update the variable 
 lm.fit1 <- update(lm.fit, ~.-age) 
 ```
+
+### 12020-2017 interaction term, non-linear transformation of the predictors 
+```{r}
+attach(Boston)
+summary(lm(medv ~ lstat*age,data=Boston))
+lm.fit2=lm(medv ~ lstat+I(lstat^2)) 
+summary(lm.fit2)
+
+lm.fit=lm(medv~lstat)
+anova(lm.fit ,lm.fit2) # variance explained by the two models, are they significantly different? F-test 
+par(mfrow=c(2,2))
+plot(lm.fit2)
+
+lm.fit5=lm(medv~poly(lstat ,5)) 
+summary(lm.fit5)
+summary(lm(medv~log(rm),data=Boston))
+
+# fix(Carseats)
+names(Carseats)  
+
+lm.fit=lm(Sales ~ .+Income:Advertising+Price:Age,data=Carseats)
+summary(lm.fit)
+
+attach(Carseats)
+contrasts(ShelveLoc) 
+```
+
 

@@ -1,0 +1,111 @@
+---
+title: "Assignment_12_20_2017"
+author: "Ruijuan Li"
+date: "12/20/2017"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r}
+library(tidyverse)
+library(MASS)
+library(ISLR)
+```
+
+### 3. 
+Suppose we have a data set with five predictors, X1 = GPA, X2 = IQ, X3 = Gender (1 for Female and 0 for Male), X4 = Interaction between GPA and IQ, and X5 = Interaction between GPA and Gender. The response is starting salary after graduation (in thousands of dollars). Suppose we use least squares to fit the model, and get βˆ0=50, βˆ1=20 , βˆ2=0.07 , βˆ3=35 , βˆ4=0.01 , βˆ5=−10.
+
+(a) Which answer is correct, and why?
+
+i. For a fixed value of IQ and GPA, males earn more on average than females.
+
+ii. For a fixed value of IQ and GPA, females earn more on average than males.
+
+iii. For a fixed value of IQ and GPA,males earn more on average than females provided that the GPA is high enough.
+
+iv. For a fixed value of IQ and GPA, females earn more on average than males provided that the GPA is high enough.
+
+iv is correct, the coefficient indicates that when GPA is greater than 3.5, female earn more on average than male for a fixed value of IQ. 
+
+(b) Predict the salary of a female with IQ of 110 and a GPA of 4.0.
+
+```{r}
+50 + 20*4.0 + 0.07*110 + 35*1 + 0.01*4.0*110 + (-10)*4.0*1 
+# this is calculating the averaged salary for female with IQ of 110 and GPA of 4.0 w/o confidence interval.  
+```
+
+(c) True or false: Since the coefficient for the GPA/IQ interaction term is very small, there is very little evidence of an interaction effect. Justify your answer.
+
+False, the coeffcient being small doesn't mean the term it is associated with is non-significant, need to check its SE, t statistics, and p-value. 
+
+### 9. 
+This question involves the use of multiple linear regression on the Auto data set.
+
+(d) Use the plot() function to produce diagnostic plots of the linear regression fit. Comment on any problems you see with the fit. Do the residual plots suggest any unusually large outliers? Does the leverage plot identify any observations with unusually high leverage?
+
+The first several question was answered last time 
+https://github.com/UCD-pbio-rclub/ISLR_Ruijuan.Li/blob/master/R-club-Dec-13/Assignment_12_13_2017.md
+```{r}
+fit.m1 <- lm(mpg ~ .-name, data = Auto)
+summary(fit.m1)
+par(mfrow=c(2,2)) 
+plot(fit.m1)
+# plot 1 indicates the non-linearity of the response-predictor relationship, plot 2 indicates the distribution of residuals does not follow a normal distribution where at the tail it deviate from from the theoretical quantiles. plot 3 indicates there while several points have relatively higher standadized residuals, being under 3, they should be fine. plot 4 indicates there is observations with high leverage. 
+```
+
+(e) Use the * and : symbols to fit linear regression models with interaction effects. Do any interactions appear to be statistically significant?
+
+```{r}
+colnames(Auto)
+fit.m2 <- lm(mpg ~ (.-name)^2, data = Auto) 
+# displacement:year, acceleration:year, acceleration:origin are significant 
+```
+
+(f) Try a few different transformations of the variables, such as log(X), √X, X2. Comment on your findings.
+
+```{r}
+fit.m3 <- lm(mpg ~ polym(cylinders, displacement, horsepower, weight, acceleration, year, origin, degree= 2), data = Auto)
+summary(fit.m3)
+
+anova(fit.m1, fit.m3) # more variance explained 
+
+# or 
+Auto.poly <- sapply(Auto[,2:8], function(i) i^2) %>% as.data.frame()
+Auto.log <- sapply(Auto[,2:8], function(i) log(i)) %>% as.data.frame()
+Auto.sqrt <- sapply(Auto[,2:8], function(i) sqrt(i)) %>% as.data.frame()
+
+Auto[1:10, 2:8]
+Auto.poly[1:10, 1:7]
+Auto.poly$mpg <- Auto$mpg
+Auto.log[1:10, 1:7]
+Auto.log$mpg <- Auto$mpg
+Auto.sqrt[1:10, 1:7]
+Auto.sqrt$mpg <- Auto$mpg
+
+fit.m4 <- lm(mpg ~ ., data = Auto.poly)
+fit.m5 <- lm(mpg ~ ., data = Auto.log)
+fit.m6 <- lm(mpg ~ ., data = Auto.sqrt)
+
+summary(fit.m4)
+summary(fit.m5)
+summary(fit.m6) 
+
+anova(fit.m1, fit.m4)
+anova(fit.m1, fit.m5)
+anova(fit.m1, fit.m6)
+# none of them is significantly better or different compared to the original multiple linear model. 
+```
+
+### 10. 
+This question should be answered using the Carseats data set.
+
+(h) Is there evidence of outliers or high leverage observations in the model from (e)? 
+
+```{r}
+dim(Carseats)
+fit.m7 <- lm(Sales ~ Price + US, data = Carseats)
+par(mfrow=c(2,2)) 
+plot(fit.m7) # outlier no, average leverage should be (p+1)/n, which is 2+1/400 (0.0075), it looks like there are high leverage observations.  
+```
+
