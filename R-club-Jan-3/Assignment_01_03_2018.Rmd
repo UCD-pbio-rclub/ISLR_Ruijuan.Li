@@ -1,0 +1,94 @@
+---
+title: "Assignment_01_03_2018"
+author: "Ruijuan Li"
+date: "1/3/2018"
+output: html_document
+---
+
+#### 2. Carefully explain the differences between the KNN classifier and KNN regression methods.
+
+KNN (K-nearest neighbors) is a non-parametric method used for classification and regression, which is the among the simpliest of all machine learning algorithms.  
+
+In kNN classification, the output is a class membership. An object is classified by a majority vote of its neighbors, with the object being assigned to the class most common among its k nearest neighbors (k is a positive integer, typically small). If k = 1, then the object is simply assigned to the class of that single nearest neighbor. 
+
+In kNN regression, the output is the property value for the object. This value is the average of the values of its k nearest neighbors.
+
+#### 14. This problem focuses on the collinearity problem.
+
+(a) Perform the following commands in R:
+
+```{r}
+set.seed(1)
+x1=runif(100) # randomly generate 100 numbers with uniform distribution with min of 0 and max of 1
+x2=0.5*x1+rnorm(100)/10 
+y=2+2*x1+0.3*x2+rnorm(100) 
+```
+
+The last line corresponds to creating a linear model in which y is a function of x1 and x2. Write out the form of the linear model. What are the regression coefficients?
+
+2 is the coeffciient for x1, and 0.3 is the coeffcient for x2.
+
+(b) What is the correlation between x1 and x2? Create a scatterplot displaying the relationship between the variables.
+
+```{r}
+plot(x1, x2, main = round(cor(x1, x2), 2))
+```
+
+(c) Using this data, fit a least squares regression to predict y using x1 and x2. Describe the results obtained. What are βˆ0, βˆ1, and βˆ2? How do these relate to the true β0, β1, and β2? Can you reject the null hypothesis H0 : β1 = 0? How about the null hypothesis H0 : β2 = 0?
+
+```{r}
+fit.m1 <- lm(y ~ x1 + x2)
+summary(fit.m1)
+# b0 is 2.1305, b1 is 1.4396, b2 is 1.0097. b1=1 cannot be rejected, b2=0 can be rejected. 
+```
+
+(d) Now fit a least squares regression to predict y using only x1. Comment on your results. Can you reject the null hypothesis H0 :β1 =0?
+
+```{r}
+fit.m2 <- lm(y ~ x1)
+summary(fit.m2)
+# b1=0 cannnot rejected 
+```
+
+(e) Now fit a least squares regression to predict y using only x2. Comment on your results. Can you reject the null hypothesis H0 :β1 =0?
+
+```{r}
+fit.m3 <- lm(y ~ x2)
+summary(fit.m3)
+# cannot reject b1=0
+```
+
+(f) Do the results obtained in (c)–(e) contradict each other? Explain your answer.
+no, because x1 and x2 are highly correlated. 
+
+(g) Now suppose we obtain one additional observation, which was unfortunately mismeasured.
+
+```{r}
+x1=c(x1, 0.1) 
+x2=c(x2, 0.8) 
+y=c(y,6)
+```
+
+Re-fit the linear models from (c) to (e) using this new data. What effect does this new observation have on the each of the models? In each model, is this observation an outlier? A high-leverage point? Both? Explain your answers. 
+
+```{r}
+fit.m1.2 <- lm(y ~ x1 + x2)
+summary(fit.m1.2) # b1=0 can be rejected now whereas b2=0 cannot be rejected, which are different fromt the 1st fit when the new data points were not added. 
+
+fit.m2.2 <- lm(y ~ x1)
+summary(fit.m2.2)
+
+fit.m3.2 <- lm(y ~ x2)
+summary(fit.m3.2)
+
+plot(x1, x2, main = round(cor(x1, x2), 2))
+
+par(mfrow=c(2,2))
+plot(fit.m1.2) # outlier no, high leverage point yes. 
+plot(fit.m2.2) # outlier yes? (observations whose studentized residuals are greater than 3 in absolute value are possible outliers), high leverage point no. 
+plot(fit.m3.2) # outlier no, high leverage point yes.  
+
+# average leverage should be (p+1)/n, which is 1+1/100 (0.02) for fit.m2.2 and fit.m3.2, and 0/03 for fit.m1.2. so for fit.m1.2, there is obviously observation with high-leverage. 
+```
+
+
