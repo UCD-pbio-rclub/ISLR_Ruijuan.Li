@@ -33,7 +33,7 @@ The last line corresponds to creating a linear model in which y is a function of
 (b) What is the correlation between x1 and x2? Create a scatterplot displaying the relationship between the variables.
 
 ```{r}
-plot(x1, x2, main = round(cor(x1, x2), 2))
+plot(x1, x2, main = round(cor(x1, x2), 2)) 
 ```
 
 (c) Using this data, fit a least squares regression to predict y using x1 and x2. Describe the results obtained. What are βˆ0, βˆ1, and βˆ2? How do these relate to the true β0, β1, and β2? Can you reject the null hypothesis H0 : β1 = 0? How about the null hypothesis H0 : β2 = 0?

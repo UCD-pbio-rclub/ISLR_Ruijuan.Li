@@ -73,7 +73,7 @@ summary(lm.fit1)
 lm.fit1 <- update(lm.fit, ~.-age) 
 ```
 
-### 12020-2017 interaction term, non-linear transformation of the predictors 
+### 12-20-2017 interaction term, non-linear transformation of the predictors 
 ```{r}
 attach(Boston)
 summary(lm(medv ~ lstat*age,data=Boston))
@@ -97,6 +97,35 @@ summary(lm.fit)
 
 attach(Carseats)
 contrasts(ShelveLoc) 
+```
+
+### 01-23-2018 linear discriminant analysis 
+```{r}
+# LDA: linear discriminant analysis 
+library(MASS)
+library(ISLR)
+attach(Smarket)
+train =Smarket$Year < 2005
+Smarket.2005= Smarket [! train ,]
+Direction.2005=Direction[!train]
+
+lda.fit=lda(Direction ~ Lag1+Lag2,data=Smarket, subset=train)
+lda.fit
+
+lda.pred=predict(lda.fit, Smarket.2005)
+names(lda.pred)
+
+lda.class=lda.pred$class
+table(lda.class ,Direction.2005)
+
+mean(lda.class==Direction.2005)
+sum(lda.pred$posterior[,1]>=.5) 
+sum(lda.pred$posterior[,1]<.5)
+
+lda.pred$posterior[1:20,1] 
+lda.class[1:20]
+
+sum(lda.pred$posterior[,1]>.9)  
 ```
 
 
