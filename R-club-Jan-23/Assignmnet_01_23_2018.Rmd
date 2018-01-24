@@ -20,7 +20,7 @@ library(ISLR)
 Weekly %>% summary() 
 train = (Weekly$Year >= 1990 & Weekly$Year <=  2008)
 lda.fit.1=lda(Direction ~ Lag2,data=Weekly, subset=train)  
-lda.fit.1
+lda.fit.1 
 
 Weekly.2005= Weekly[!train,]
 lda.pred.1=predict(lda.fit.1, Weekly.2005) 
@@ -56,6 +56,6 @@ mpg01[mpg > median(mpg)] <- 1
 Auto2 <- data.frame(Auto, mpg01)
 
 lda.fit.2=lda(mpg01 ~ weight + displacement + horsepower + cylinders,data=Auto2)  
-lda.fit.2 
+lda.fit.2    
 ```
 
