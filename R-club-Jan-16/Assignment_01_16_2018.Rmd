@@ -1,0 +1,126 @@
+---
+title: "Assignment_01_16_2018"
+author: "Ruijuan Li"
+date: "1/23/2018"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+### 6. Suppose we collect data for a group of students in a statistics class with variables X1 = hours studied, X2 = undergrad GPA, and Y = receive an A. We fit a logistic regression and produce estimated coefficient, βˆ0 = −6, βˆ1 = 0.05, βˆ2 = 1.
+
+(a) Estimate the probability that a student who studies for 40 h and has an undergrad GPA of 3.5 gets an A in the class.
+
+(b) How many hours would the student in part (a) need to study to have a 50 % chance of getting an A in the class?
+
+![figure](https://github.com/leejimmy93/bioinfo_miscs/blob/master/01-19-2018/plot.png)  
+![figure](https://github.com/leejimmy93/bioinfo_miscs/blob/master/01-19-2018/plot.png)  
+
+```{r}
+# a) 
+exp(-6 + 0.05*40 +1*3.5) / (1 + exp(-6 + 0.05*40 +1*3.5) )
+
+# b) 
+# log(0.5/0.5) = -6 + hours * 0.05 + 3.5 
+log(0.5/0.5) 
+(6 - 3.5 )/0.05 # 50 hours 
+```
+
+### 10. This question should be answered using the Weekly data set, which is part of the ISLR package. This data is similar in nature to the Smarket data from this chapter’s lab, except that it contains 1,089 weekly returns for 21 years, from the beginning of 1990 to the end of 2010.
+
+(a) Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?
+
+(b) Use the full data set to perform a logistic regression with Direction as the response and the five lag variables plus Volume as predictors. Use the summary function to print the results. Do any of the predictors appear to be statistically significant? If so, which ones?
+
+(c) Compute the confusion matrix and overall fraction of correct predictions. Explain what the confusion matrix is telling you about the types of mistakes made by logistic regression.
+
+(d) Now fit the logistic regression model using a training data period from 1990 to 2008, with Lag2 as the only predictor. Compute the confusion matrix and the overall fraction of correct predictions for the held out data (that is, the data from 2009 and 2010).
+
+```{r}
+# a) 
+library(GGally)
+library(tidyverse)
+library(MASS)
+library(ISLR)
+summary(Weekly)
+dim(Weekly) # 1089 
+attach(Weekly)
+ggpairs(Weekly, aes(color = Direction)) # seems like not obvious correlation with direction for any of the possible predictors here 
+
+# b) 
+glm.fits.1=glm(Direction ~ Lag1+Lag2+Lag3+Lag4+Lag5+Volume, data=Weekly ,family=binomial)
+summary(glm.fits.1) # 
+
+# c) 
+glm.probs=predict(glm.fits.1,type="response")
+
+glm.pred=rep("Down",1089)
+glm.pred[glm.probs >.5]="Up"
+
+table(glm.pred,Direction) 
+48 + 430 / 1089 # 48% error rate, which the model does not have the right prediction 
+
+# d) 
+train =( Year >= 1990 & Year <= 2008)
+Weekly.test= Weekly[!train ,]
+dim(Weekly.test) # 104 
+train %>% sum()
+Direction.test=Direction[!train]
+
+glm.fits.2=glm(Direction ~ Lag2, data=Weekly,family=binomial,subset=train)
+
+glm.probs=predict(glm.fits.2,Weekly.test,type="response")
+
+glm.pred=rep("Down",104)
+glm.pred[glm.probs >.5]="Up"
+table(glm.pred,Direction.test)
+
+(5+34)/104  # 37.5 test error rate 
+```
+
+### 11. In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the Auto data set.
+
+(a) Create a binary variable, mpg01, that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the median() function. Note you may find it helpful to use the data.frame() function to create a single data set containing both mpg01 and the other Auto variables.
+
+(b) Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01? Scat- terplots and boxplots may be useful tools to answer this ques- tion. Describe your findings.
+
+(c) Split the data into a training set and a test set.
+
+(f) Perform logistic regression on the training data in order to pre- dict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained? 
+
+```{r}
+# a) 
+Auto2 <- 
+Auto %>% 
+  mutate(mpg01 = as.factor(ifelse(mpg > median(mpg), 1, 0))) 
+  
+# b) 
+Auto2 %>% 
+  dplyr::select(-name) %>% 
+  ggpairs(aes(color = mpg01)) # mpg, displacement, horsepower, weight 
+
+# c) 
+# decided to use 80% as training set 
+Auto %>% nrow() * 0.8
+
+set.seed(1)
+train_ID <- sample(rownames(Auto), size = round(nrow(Auto) * 0.8), replace = F) 
+train <- Auto2[rownames(Auto) %in% train_ID,]
+test <- Auto2[!(rownames(Auto) %in% train_ID),] 
+
+dim(train)
+dim(test) # 78
+
+# d) 
+glm.fits.3=glm(mpg01 ~ displacement + horsepower + weight, data=train,family=binomial) 
+glm.probs=predict(glm.fits.3,test,type="response")
+
+glm.pred=rep(0,78)
+glm.pred[glm.probs >.5]=1
+table(glm.pred,test$mpg01)
+
+(3 + 5) / 78 
+# error rate is very low, 10% 
+```
+
+
