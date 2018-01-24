@@ -13,8 +13,8 @@ output:
 
 (b) How many hours would the student in part (a) need to study to have a 50 % chance of getting an A in the class?
 
-![figure](https://github.com/leejimmy93/bioinfo_miscs/blob/master/01-19-2018/plot.png)  
-![figure](https://github.com/leejimmy93/bioinfo_miscs/blob/master/01-19-2018/plot.png)  
+![figure](https://github.com/UCD-pbio-rclub/ISLR_Ruijuan.Li/blob/master/R-club-Jan-16/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-01-23%2004.44.09%20PM.png)  
+![figure](https://github.com/UCD-pbio-rclub/ISLR_Ruijuan.Li/blob/master/R-club-Jan-16/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-01-23%2004.49.16%20PM.png)   
 
 ```{r}
 # a) 
