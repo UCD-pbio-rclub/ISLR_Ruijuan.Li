@@ -191,7 +191,7 @@ sum(lda.pred$posterior[,1]>.9)
 # pi(k) = Pr(Y = k): prior probaility 
 # fk(x): probability of y=k for given X=x. 
 
-# random cross validataion: to avoid samples which have abnormal values fall into the same group 
+# random cross validataion: to avoid samples which have abnormal values fall into the same group
 ```
 
 ### 01-30-2018 QDA & KNN 
@@ -200,7 +200,7 @@ sum(lda.pred$posterior[,1]>.9)
 # t distribution on page 153
 # correlation between predictors... ??? don't quite get it...  
 
-library(MASS)
+library(MASS) 
 library(ISLR)
 attach(Smarket)
 train =Smarket$Year < 2005
@@ -220,8 +220,8 @@ unique(Smarket$Year)
 
 ### KNN 
 library(class)
-lag1
-lag2
+Lag1
+Lag2
 train.X=cbind(Lag1 ,Lag2)[train ,] # the two P, Lag1 and Lag2, traning set 
 test.X=cbind(Lag1,Lag2)[!train,] # test set
 train.Direction =Direction [train] # direction for training set 
@@ -290,5 +290,9 @@ table(glm.pred,test.Y)
 test.Y
 glm.pred 
 11/(22+11) 
+
+### QDA handels the problem when the variance for different classes of K are different. 
+### QDA handels the problem when the correlation of different P in different class of K are different   
+
 ```
 

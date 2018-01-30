@@ -13,7 +13,7 @@ We now examine the differences between LDA and QDA.
 
 (a) If the Bayes decision boundary is linear, do we expect LDA or QDA to perform better on the training set? On the test set?
 
-LDA better on the test set and training set 
+LDA better training set but the QDA may capture the variance in the training set (fit the model better)
 
 (b) If the Bayes decision boundary is non-linear, do we expect LDA or QDA to perform better on the training set? On the test set?
 
@@ -25,11 +25,11 @@ improve, because "LDA tends to be a better bet than QDA if there are relatively 
 
 (d) True or False: Even if the Bayes decision boundary for a given problem is linear, we will probably achieve a superior test er- ror rate using QDA rather than LDA because QDA is flexible enough to model a linear decision boundary. Justify your answer.
 
-False. Scenario 3 where the underline distribution violated normal distribution resulted a high error rate for QDA.  
+False. QDA might do better on the training but not on the test set 
 
 ### 8.
 
-Suppose that we take a data set, divide it into equally-sized training and test sets, and then try out two different classification procedures. First we use logistic regression and get an error rate of 20 % on the training data and 30 % on the test data. Next we use 1-nearest neigh- bors (i.e. K = 1) and get an average error rate (averaged over both test and training data sets) of 18%. Based on these results, which method should we prefer to use for classification of new observations? Why?
+Suppose that we take a data set, divide it into equally-sized training and test sets, and then try out two different classification procedures. First we use logistic regression and get an error rate of 20 % on the training data and 30 % on the test data. Next we use 1-nearest neigh- bors (i.e. K = 1) and get an average error rate (averaged over both test and training data sets) of 18%. Based on these results, which method should we prefer to use for classification of new observations? Why? 
 
 Depends on the data, it can be that KNN has very small error for training set but very large error for test set (>30%) when the data are sampled from a more complicated non-linear function (scenario 6). So although KNN performes well on the training set, it has very large error for test set. So to be safe, I would select logistic regression unless the bayes decision boundary is very unlinear (Scenoria 5). 
 
@@ -237,7 +237,7 @@ mpg01.train =train$mpg01 # direction for training set
 # k = 3
 # set.seed(1) # why set.seed() ?
 # knn.pred.4=knn(train.2,test.2,mpg01.train ,k=3)
-# table(knn.pred.4,mpg01.test)
+# table(knn.pred.4,mpg01.test) 
 
 (3+6)/78 # 11.5% error rate 
 
@@ -255,14 +255,14 @@ mpg01.train =train$mpg01 # direction for training set
 Using the Boston data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your findings. 
 
 ```{r}
-colnames(Boston)
+colnames(Boston) 
 
 Boston2 <- 
   Boston %>% 
   mutate(crim01 = as.factor(ifelse(crim > median(crim), 1, 0))) %>% 
   dplyr::select(-crim)
 
-colnames(Boston2)  
+colnames(Boston2)   
 
 # get training & test dataset 
 set.seed(1)
@@ -296,7 +296,7 @@ lda.pred=predict(lda.fit, test)
 
 lda.class=lda.pred$class
 table(lda.class ,test$crim01)
-(25+7)/192 # 16.7 
+(25+7)/192 # 16.7    
 
 # KNN 
 # opps, forget to standadize data in the previous Q ... 
