@@ -132,9 +132,9 @@ test.1=Lag2[!train] %>% as.matrix() # test set
 train.Direction =Direction [train] # direction for training set 
 train.Direction 
 
-set.seed(1) # why set.seed() ?
-knn.pred.1=knn(train.1,test.1,train.Direction ,k=1)
-table(knn.pred.1,Direction.test)
+# set.seed(1) # why set.seed() ?
+# knn.pred.1=knn(train.1,test.1,train.Direction ,k=1)
+# table(knn.pred.1,Direction.test)
 
 (30+22)/104 # 50% error rate, highest among the 4 
 
@@ -142,15 +142,15 @@ table(knn.pred.1,Direction.test)
 # logistic & LDA gave the same best result 
 
 # i) try differnt k here 
-set.seed(1) # why set.seed() ?
-knn.pred.2=knn(train.1,test.1,train.Direction ,k=3)
-table(knn.pred.2,Direction.test)
+# set.seed(1) # why set.seed() ?
+# knn.pred.2=knn(train.1,test.1,train.Direction ,k=3)
+# table(knn.pred.2,Direction.test)
 
 (20+27)/104 # 45% error rate
 
-set.seed(1) # why set.seed() ?
-knn.pred.3=knn(train.1,test.1,train.Direction ,k=5)
-table(knn.pred.3,Direction.test)
+# set.seed(1) # why set.seed() ?
+# knn.pred.3=knn(train.1,test.1,train.Direction ,k=5)
+# table(knn.pred.3,Direction.test)
 
 (21+27)/104 # 46% error rate 
 ```
@@ -220,7 +220,7 @@ table(glm.pred,test$mpg01)
 # g) 
 # k = 1 
 ####  need to standadize here... because multiple predictors 
-standardized.X=scale(Auto2[,c("displacenemnt", "horsepower", "weight")])  
+# standardized.X=scale(Auto2[,c("displacenemnt", "horsepower", "weight")])  
 
 colnames(Auto2)
 train.2 <- train[,c("displacement", "horsepower", "weight")]
@@ -228,23 +228,23 @@ test.2 <- test[,c("displacement", "horsepower", "weight")]
 
 mpg01.train =train$mpg01 # direction for training set 
 
-set.seed(1) # why set.seed() ?
-knn.pred.3=knn(train.2,test.2,mpg01.train ,k=1)
-table(knn.pred.3,mpg01.test)
+# set.seed(1) # why set.seed() ?
+# knn.pred.3=knn(train.2,test.2,mpg01.train ,k=1)
+# table(knn.pred.3,mpg01.test)
 
 (6+6)/78 # 15% error rate 
 
 # k = 3
-set.seed(1) # why set.seed() ?
-knn.pred.4=knn(train.2,test.2,mpg01.train ,k=3)
-table(knn.pred.4,mpg01.test)
+# set.seed(1) # why set.seed() ?
+# knn.pred.4=knn(train.2,test.2,mpg01.train ,k=3)
+# table(knn.pred.4,mpg01.test)
 
 (3+6)/78 # 11.5% error rate 
 
 # k = 5 
-set.seed(1) # why set.seed() ?
-knn.pred.4=knn(train.2,test.2,mpg01.train ,k=5)
-table(knn.pred.4,mpg01.test)
+# set.seed(1) # why set.seed() ?
+# knn.pred.4=knn(train.2,test.2,mpg01.train ,k=5)
+# table(knn.pred.4,mpg01.test)
 
 (4+7)/78 # 14% error rate 
 # should be able to draw a plot using k as x-axis and error rate as y-axis to see how error rate changes with a increased k. 
@@ -260,7 +260,7 @@ colnames(Boston)
 Boston2 <- 
   Boston %>% 
   mutate(crim01 = as.factor(ifelse(crim > median(crim), 1, 0))) %>% 
-  select(-crim)
+  dplyr::select(-crim)
 
 colnames(Boston2)  
 
@@ -300,20 +300,5 @@ table(lda.class ,test$crim01)
 
 # KNN 
 # opps, forget to standadize data in the previous Q ... 
-
-
-train.X=standardized.X[-test ,]
-test.X=standardized.X[test ,]
-train.Y=Purchase [-test]
-test.Y=Purchase [test]
-set.seed (1)
-knn.pred=knn(train.X,test.X,train.Y,k=1)
-mean(test.Y!=knn.pred) 
-mean(test.Y!="No")
-
-table(knn.pred,test.Y) 
-test.Y
-knn.pred 
-9/(68+9) # the fraction of individual predicted to buy insurance  
 ```
 
