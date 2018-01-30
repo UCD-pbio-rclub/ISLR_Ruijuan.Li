@@ -158,9 +158,6 @@ table(glm.pred,Direction.2005)
 
 mean(glm.pred==Direction.2005)
 106/(106+76)
-
-
-
 ```
 
 ### 01-23-2018 linear discriminant analysis 
@@ -197,4 +194,101 @@ sum(lda.pred$posterior[,1]>.9)
 # random cross validataion: to avoid samples which have abnormal values fall into the same group 
 ```
 
+### 01-30-2018 QDA & KNN 
+```{r}
+# Qs on the text: page 150, LDA vs QDA vs KNN 
+# t distribution on page 153
+# correlation between predictors... ??? don't quite get it...  
+
+library(MASS)
+library(ISLR)
+attach(Smarket)
+train =Smarket$Year < 2005
+Smarket.2005= Smarket [!train,]
+Direction.2005=Direction[!train]
+
+### QDA 
+qda.fit=qda(Direction ~ Lag1+Lag2,data=Smarket ,subset=train)
+qda.fit # don't understand the summary result 
+
+qda.class=predict(qda.fit,Smarket.2005)$class 
+table(qda.class ,Direction.2005)
+
+mean(qda.class==Direction.2005)
+
+unique(Smarket$Year)
+
+### KNN 
+library(class)
+lag1
+lag2
+train.X=cbind(Lag1 ,Lag2)[train ,] # the two P, Lag1 and Lag2, traning set 
+test.X=cbind(Lag1,Lag2)[!train,] # test set
+train.Direction =Direction [train] # direction for training set 
+train.Direction
+
+set.seed(1) # why set.seed() ?
+knn.pred=knn(train.X,test.X,train.Direction ,k=1)
+table(knn.pred,Direction.2005)
+
+(83+43) /252
+
+knn.pred=knn(train.X,test.X,train.Direction ,k=3)
+table(knn.pred,Direction.2005)
+
+mean(knn.pred==Direction.2005)
+
+### An application to Caravan Insurance Data 
+dim(Caravan) 
+attach(Caravan)
+summary(Purchase)
+
+standardized.X=scale(Caravan [,-86]) # why scale and center expression data when include it as predictors for genomic prediction 
+var ( Caravan [ ,1]) 
+var ( Caravan [ ,2])
+var(standardized.X[,1]) 
+var(standardized.X[,2])
+
+test =1:1000
+train.X=standardized.X[-test ,]
+test.X=standardized.X[test ,]
+train.Y=Purchase [-test]
+test.Y=Purchase [test]
+set.seed (1)
+knn.pred=knn(train.X,test.X,train.Y,k=1)
+mean(test.Y!=knn.pred) 
+mean(test.Y!="No")
+
+table(knn.pred,test.Y) 
+test.Y
+knn.pred 
+9/(68+9) # the fraction of individual predicted to buy insurance 
+
+knn.pred=knn(train.X,test.X,train.Y,k=3) 
+table(knn.pred,test.Y)
+test.Y 
+knn.pred
+5/26
+knn.pred=knn(train.X,test.X,train.Y,k=5)
+table(knn.pred,test.Y)
+test.Y 
+knn.pred 
+4/15
+
+# Logestic regression  
+glm.fits=glm(Purchase ~.,data=Caravan ,family=binomial, subset=-test)
+glm.probs=predict(glm.fits,Caravan[test,],type="response")
+glm.pred=rep("No",1000)
+glm.pred[glm.probs >.5]="Yes" # need to understand these more... 
+table(glm.pred,test.Y)
+test.Y 
+glm.pred 
+
+glm.pred=rep("No",1000)
+glm.pred[glm.probs >.25]=" Yes"
+table(glm.pred,test.Y)
+test.Y
+glm.pred 
+11/(22+11) 
+```
 

@@ -1,0 +1,319 @@
+---
+title: "Assignment_01_30_2018"
+author: "Ruijuan Li"
+date: "1/29/2018"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+### 5. 
+
+We now examine the differences between LDA and QDA.
+
+(a) If the Bayes decision boundary is linear, do we expect LDA or QDA to perform better on the training set? On the test set?
+
+LDA better on the test set and training set 
+
+(b) If the Bayes decision boundary is non-linear, do we expect LDA or QDA to perform better on the training set? On the test set?
+
+QDA better on the test set and training set 
+
+(c) In general, as the sample size n increases, do we expect the test prediction accuracy of QDA relative to LDA to improve, decline, or be unchanged? Why? 
+
+improve, because "LDA tends to be a better bet than QDA if there are relatively few training observations and so reducing variance is crucial. In contrast, QDA is recommended if the training set is very large, so that the variance of the classifier is not a major concern, or if the assumption of a common covariance matrix for the K classes is clearly untenable."
+
+(d) True or False: Even if the Bayes decision boundary for a given problem is linear, we will probably achieve a superior test er- ror rate using QDA rather than LDA because QDA is flexible enough to model a linear decision boundary. Justify your answer.
+
+False. Scenario 3 where the underline distribution violated normal distribution resulted a high error rate for QDA.  
+
+### 8.
+
+Suppose that we take a data set, divide it into equally-sized training and test sets, and then try out two different classification procedures. First we use logistic regression and get an error rate of 20 % on the training data and 30 % on the test data. Next we use 1-nearest neigh- bors (i.e. K = 1) and get an average error rate (averaged over both test and training data sets) of 18%. Based on these results, which method should we prefer to use for classification of new observations? Why?
+
+Depends on the data, it can be that KNN has very small error for training set but very large error for test set (>30%) when the data are sampled from a more complicated non-linear function (scenario 6). So although KNN performes well on the training set, it has very large error for test set. So to be safe, I would select logistic regression unless the bayes decision boundary is very unlinear (Scenoria 5). 
+
+### 9. 
+
+This problem has to do with odds.
+
+(a) On average, what fraction of people with an odds of 0.37 of defaulting on their credit card payment will in fact default?
+
+0.37 odds ratio means for a person the probability of default VS non-default is 0.37. 
+```{r}
+0.37/(1+0.37) # 27% 
+```
+
+(b) Suppose that an individual has a 16% chance of defaulting on her credit card payment. What are the odds that she will de- fault?
+
+```{r}
+0.16/(1-0.16) # 0.19 
+```
+
+### Applied  
+
+### 10 
+
+(f) Repeat (d) using QDA.
+
+(g) Repeat (d) using KNN with K = 1.
+
+(h) Which of these methods appears to provide the best results on this data?
+
+(i) Experiment with different combinations of predictors, including possible transformations and interactions, for each of the methods. Report the variables, method, and associated confu- sion matrix that appears to provide the best results on the held out data. Note that you should also experiment with values for K in the KNN classifier.
+
+```{r}
+# a) 
+
+library(GGally)
+library(tidyverse)
+library(MASS) 
+library(ISLR)
+summary(Weekly)
+dim(Weekly) # 1089 
+attach(Weekly) 
+
+# ggpairs(Weekly, aes(color = Direction)) # seems like not obvious correlation with direction for any of the possible predictors here 
+
+# b) 
+glm.fits.1=glm(Direction ~ Lag1+Lag2+Lag3+Lag4+Lag5+Volume, data=Weekly ,family=binomial)
+summary(glm.fits.1) # Lag2  
+
+# c) 
+glm.probs=predict(glm.fits.1,type="response")
+
+glm.pred=rep("Down",1089)
+glm.pred[glm.probs >.5]="Up"
+
+table(glm.pred,Direction) 
+48 + 430 / 1089 # 48% error rate, which the model does not have the right prediction 
+
+# d) 
+train =( Year >= 1990 & Year <= 2008)
+Weekly.test= Weekly[!train ,]
+dim(Weekly.test) # 104 
+train %>% sum()
+Direction.test=Direction[!train]
+
+glm.fits.2=glm(Direction ~ Lag2, data=Weekly,family=binomial,subset=train)
+
+glm.probs=predict(glm.fits.2,Weekly.test,type="response")
+
+glm.pred=rep("Down",104)
+glm.pred[glm.probs >.5]="Up"
+table(glm.pred,Direction.test)
+
+(5+34)/104  # 37.5 test error rate  
+
+# e) 
+lda.fit.1=lda(Direction ~ Lag2,data=Weekly, subset=train)   
+
+test= Weekly[!train,] 
+lda.pred.1=predict(lda.fit.1, test) 
+
+Direction.test=Weekly$Direction[!train]
+lda.class.1=lda.pred.1$class
+table(lda.class.1 ,Direction.test)
+(5+34)/104 # same error rate as in d, check error rate on test data 
+
+# f) 
+qda.fit.1=qda(Direction ~ Lag2,data=Weekly ,subset=train) # fit data on training set 
+qda.fit.1 # check fit summary, don't understand the summary result 
+
+qda.pred.1 = predict(qda.fit.1, test)
+qda.class.1=qda.pred.1$class 
+table(qda.class.1 ,Direction.test)
+
+43/104 # 41% higher than the LDA & logistic regression 
+
+# g) 
+train.1=(Lag2[train]) %>% as.matrix() # the P Lag2, traning set 
+test.1=Lag2[!train] %>% as.matrix() # test set
+train.Direction =Direction [train] # direction for training set 
+train.Direction 
+
+set.seed(1) # why set.seed() ?
+knn.pred.1=knn(train.1,test.1,train.Direction ,k=1)
+table(knn.pred.1,Direction.test)
+
+(30+22)/104 # 50% error rate, highest among the 4 
+
+# h) 
+# logistic & LDA gave the same best result 
+
+# i) try differnt k here 
+set.seed(1) # why set.seed() ?
+knn.pred.2=knn(train.1,test.1,train.Direction ,k=3)
+table(knn.pred.2,Direction.test)
+
+(20+27)/104 # 45% error rate
+
+set.seed(1) # why set.seed() ?
+knn.pred.3=knn(train.1,test.1,train.Direction ,k=5)
+table(knn.pred.3,Direction.test)
+
+(21+27)/104 # 46% error rate 
+```
+
+### 11
+
+(e) Perform QDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
+
+(f) Perform logistic regression on the training data in order to pre- dict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
+
+(g) Perform KNN on the training data, with several values of K, in order to predict mpg01. Use only the variables that seemed most associated with mpg01 in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?
+
+```{r}
+# a) 
+Auto2 <- 
+Auto %>% 
+  mutate(mpg01 = as.factor(ifelse(mpg > median(mpg), 1, 0))) 
+  
+# b) 
+# Auto2 %>% 
+#   dplyr::select(-name) %>% 
+#   ggpairs(aes(color = mpg01)) # mpg, displacement, horsepower, weight 
+
+# c) 
+# decided to use 80% as training set 
+Auto %>% nrow() * 0.8
+
+set.seed(1)
+train_ID <- sample(rownames(Auto), size = round(nrow(Auto) * 0.8), replace = F) 
+train <- Auto2[rownames(Auto) %in% train_ID,]
+test <- Auto2[!(rownames(Auto) %in% train_ID),] 
+
+dim(train)
+dim(test) # 78
+
+# d) 
+attach(Auto2)
+lda.fit.2=lda(mpg01 ~ weight + displacement + horsepower + cylinders,data=train)  
+lda.fit.2 
+lda.pred.2=predict(lda.fit.2, test) 
+
+mpg01.test <- test$mpg01 
+lda.class.2=lda.pred.2$class
+table(lda.class.2 ,mpg01.test)
+(1+4)/78 # 6% test error rate 
+
+# e) 
+qda.fit.2=qda(mpg01 ~ weight + displacement + horsepower + cylinders,data=train)  
+qda.fit.2 
+qda.pred.2=predict(qda.fit.2, test) 
+
+qda.class.2=qda.pred.2$class
+table(qda.class.2 ,mpg01.test)
+(4+3)/78 # 9% test error rate 
+
+# f) 
+glm.fits.3=glm(mpg01 ~ displacement + horsepower + weight, data=train,family=binomial) 
+glm.probs=predict(glm.fits.3,test,type="response")
+
+glm.pred=rep(0,78)
+glm.pred[glm.probs >.5]=1
+table(glm.pred,test$mpg01)
+
+(3 + 5) / 78 
+# error rate is very low, 10%  
+
+# g) 
+# k = 1 
+####  need to standadize here... because multiple predictors 
+standardized.X=scale(Auto2[,c("displacenemnt", "horsepower", "weight")])  
+
+colnames(Auto2)
+train.2 <- train[,c("displacement", "horsepower", "weight")]
+test.2 <- test[,c("displacement", "horsepower", "weight")]
+
+mpg01.train =train$mpg01 # direction for training set 
+
+set.seed(1) # why set.seed() ?
+knn.pred.3=knn(train.2,test.2,mpg01.train ,k=1)
+table(knn.pred.3,mpg01.test)
+
+(6+6)/78 # 15% error rate 
+
+# k = 3
+set.seed(1) # why set.seed() ?
+knn.pred.4=knn(train.2,test.2,mpg01.train ,k=3)
+table(knn.pred.4,mpg01.test)
+
+(3+6)/78 # 11.5% error rate 
+
+# k = 5 
+set.seed(1) # why set.seed() ?
+knn.pred.4=knn(train.2,test.2,mpg01.train ,k=5)
+table(knn.pred.4,mpg01.test)
+
+(4+7)/78 # 14% error rate 
+# should be able to draw a plot using k as x-axis and error rate as y-axis to see how error rate changes with a increased k. 
+```
+
+### 13. 
+
+Using the Boston data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your findings. 
+
+```{r}
+colnames(Boston)
+
+Boston2 <- 
+  Boston %>% 
+  mutate(crim01 = as.factor(ifelse(crim > median(crim), 1, 0))) %>% 
+  select(-crim)
+
+colnames(Boston2)  
+
+# get training & test dataset 
+set.seed(1)
+train_ID <- sample(rownames(Boston2), size = round(nrow(Auto) * 0.8), replace = F) 
+train <- Boston2[rownames(Boston2) %in% train_ID,]
+test <- Boston2[!(rownames(Boston2) %in% train_ID),] 
+
+dim(train) # 314
+dim(test) # 192
+
+# logsitic, full model to test which one is significant 
+attach(Boston2)
+
+glm.fits.1 <- glm(crim01 ~ ., data = train, family=binomial)
+glm.fits.1 %>% summary() # nox, age, dis, and rad are important 
+
+# make prediction only using the several imporant predictors 
+glm.fits <- glm(crim01 ~ nox + age + dis + rad, data = train, family=binomial)
+glm.probs=predict(glm.fits,test,type="response")
+
+glm.pred=rep(0,192)
+glm.pred[glm.probs >.5]=1 # need to understand these more... 
+table(glm.pred,test$crim01)
+(21+13)/(192) # 17.7% test error rate 
+
+# LDA
+lda.fit=lda(crim01 ~ nox + age + dis + rad,data=train)
+lda.fit
+
+lda.pred=predict(lda.fit, test)
+
+lda.class=lda.pred$class
+table(lda.class ,test$crim01)
+(25+7)/192 # 16.7 
+
+# KNN 
+# opps, forget to standadize data in the previous Q ... 
+
+
+train.X=standardized.X[-test ,]
+test.X=standardized.X[test ,]
+train.Y=Purchase [-test]
+test.Y=Purchase [test]
+set.seed (1)
+knn.pred=knn(train.X,test.X,train.Y,k=1)
+mean(test.Y!=knn.pred) 
+mean(test.Y!="No")
+
+table(knn.pred,test.Y) 
+test.Y
+knn.pred 
+9/(68+9) # the fraction of individual predicted to buy insurance  
+```
+
