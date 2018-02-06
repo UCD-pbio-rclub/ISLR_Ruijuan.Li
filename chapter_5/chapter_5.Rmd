@@ -262,6 +262,7 @@ summary(fit.m3)
 
 fit.m4 <- lm(y ~ poly(x, degree= 4), data = data)
 summary(fit.m4)
-### forget how to get the best model using least squre method... 
+
+### forget how to get the best model using least squre method... the model with the highest adjusted R square value should be the best model.  
 ```
 

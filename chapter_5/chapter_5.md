@@ -825,6 +825,6 @@ summary(fit.m4)
 ```
 
 ```r
-### forget how to get the best model using least squre method... 
+### forget how to get the best model using least squre method... the model with the highest adjusted R square value should be the best model.  
 ```
 
