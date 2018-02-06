@@ -1,0 +1,265 @@
+---
+title: "chapter_5"
+author: "Ruijuan Li"
+date: "2/5/2018"
+output: html_document
+---
+
+### 3 
+
+We now review k-fold cross-validation.
+
+(a) Explain how k-fold cross-validation is implemented.
+
+randomly dividing the set of observations into K groups, or folds of approximately equal size. The 1st fold is treated as a validation set, and the method is fit on the remaining  k-1 folds. The MSE1 is then computed on the observation in the held-out fold. This procedure is repeated for k times; each time, a different group of observation is treated as a validation set. The process resulted in k estimates of the test error, MSE1... MSEk. The k-fold CV estiamte is computed by avaraging these values. 
+
+(b) What are the advantages and disadvantages of k-fold cross-validation relative to: i. The validation set approach? ii. LOOCV. 
+
+low bias and low variance compared to validation set approach, however, more computationally expensive. Compared to LOOCV, low variance and has computational advantage. 
+
+### 5 
+
+In Chapter 4, we used logistic regression to predict the probability of default using income and balance on the Default data set. We will now estimate the test error of this logistic regression model using the validation set approach. Do not forget to set a random seed before beginning your analysis.
+
+(a) Fit a logistic regression model that uses income and balance to predict default.
+
+(b) Using the validation set approach, estimate the test error of this model. In order to do this, you must perform the following steps:
+
+i. Split the sample set into a training set and a validation set.
+
+ii. Fit a multiple logistic regression model using only the training observations.
+
+iii. Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability is greater than 0.5.
+
+iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.
+
+(c) Repeat the process in (b) three times, using three different splits of the observations into a training set and a validation set. Comment on the results obtained.
+
+(d) Now consider a logistic regression model that predicts the prob- ability of default using income, balance, and a dummy variable for student. Estimate the test error for this model using the val- idation set approach. Comment on whether or not including a dummy variable for student leads to a reduction in the test error rate. 
+
+```{r}
+library(tidyverse)
+library(boot)
+library(ISLR)
+
+# a) 
+attach(Default)
+head(Default)
+glm.fits.1=glm(default ~ balance + income, data=Default ,family=binomial)
+summary(glm.fits.1)
+
+glm.probs = predict(glm.fits.1, type = "response")
+glm.pred = rep("No", nrow(Default))
+glm.pred[glm.probs > .5] = "yes"
+table(glm.pred, default)
+(225 + 38)/ nrow(Default) # 2% training set error 
+
+# b) 
+set.seed(1)
+train_ID <- sample(rownames(Default), size = round(nrow(Default) * 0.5), replace = F) 
+train <- Default[rownames(Default) %in% train_ID,]
+test <- Default[!(rownames(Default) %in% train_ID),] 
+
+glm.fits.2<-glm(default~balance + income ,data=train, family = binomial)
+summary(glm.fits.2)
+
+glm.probs = predict(glm.fits.2, test, type = "response")
+glm.pred = rep("No", nrow(Default)/2)
+glm.pred[glm.probs > .5] = "yes"
+table(glm.pred, test$default)
+(100 + 18)/ (nrow(Default)/2) # 2% training set error 
+
+# c) 
+set.seed(2)
+train_ID <- sample(rownames(Default), size = round(nrow(Default) * 0.5), replace = F) 
+train <- Default[rownames(Default) %in% train_ID,]
+test <- Default[!(rownames(Default) %in% train_ID),] 
+
+glm.fits.2<-glm(default~balance + income ,data=train, family = binomial)
+summary(glm.fits.2)
+
+glm.probs = predict(glm.fits.2, test, type = "response")
+glm.pred = rep("No", nrow(Default)/2)
+glm.pred[glm.probs > .5] = "yes"
+table(glm.pred, test$default)
+(118 + 20)/ (nrow(Default)/2) # 2% training set error 
+
+set.seed(3)
+train_ID <- sample(rownames(Default), size = round(nrow(Default) * 0.5), replace = F) 
+train <- Default[rownames(Default) %in% train_ID,]
+test <- Default[!(rownames(Default) %in% train_ID),] 
+
+glm.fits.2<-glm(default~balance + income ,data=train, family = binomial)
+summary(glm.fits.2)
+
+glm.probs = predict(glm.fits.2, test, type = "response")
+glm.pred = rep("No", nrow(Default)/2)
+glm.pred[glm.probs > .5] = "yes"
+table(glm.pred, test$default)
+(108 + 16)/ (nrow(Default)/2) # 2% training set error 
+
+### not much different, probably because the training set is big enough. 
+
+# d) 
+set.seed(1)
+train_ID <- sample(rownames(Default), size = round(nrow(Default) * 0.5), replace = F) 
+train <- Default[rownames(Default) %in% train_ID,]
+test <- Default[!(rownames(Default) %in% train_ID),] 
+
+glm.fits.2<-glm(default~balance + income + student,data=train, family = binomial)
+summary(glm.fits.2)
+
+glm.probs = predict(glm.fits.2, test, type = "response")
+glm.pred = rep("No", nrow(Default)/2)
+glm.pred[glm.probs > .5] = "yes"
+table(glm.pred, test$default)
+(110 + 14)/ (nrow(Default)/2) # 2% training set error 
+# not much difference, did I do something wrong? 
+```
+
+### 7 
+
+In Sections 5.3.2 and 5.3.3, we saw that the cv.glm() function can be used in order to compute the LOOCV test error estimate. Alterna- tively, one could compute those quantities using just the glm() and predict.glm() functions, and a for loop. You will now take this ap- proach in order to compute the LOOCV error for a simple logistic regression model on the Weekly data set. Recall that in the context of classification problems, the LOOCV error is given in (5.4).
+
+(a) Fit a logistic regression model that predicts Direction using Lag1 and Lag2.
+
+(b) Fit a logistic regression model that predicts Direction using Lag1 and Lag2 using all but the first observation.
+
+(c) Use the model from (b) to predict the direction of the first obser- vation. You can do this by predicting that the first observation will go up if P(Direction="Up"|Lag1, Lag2) > 0.5. Was this ob- servation correctly classified?
+
+(d) Write a for loop from i=1 to i=n,where n is the number of observations in the data set, that performs each of the following steps:
+
+i. Fit a logistic regression model using all but the ith obser- vation to predict Direction using Lag1 and Lag2.
+
+ii. Compute the posterior probability of the market moving up for the ith observation.
+
+iii. Use the posterior probability for the ith observation in order to predict whether or not the market moves up.
+
+iv. Determine whether or not an error was made in predicting the direction for the ith observation. If an error was made, then indicate this as a 1, and otherwise indicate it as a 0.
+
+(e) Take the average of the n numbers obtained in (d)iv in order to obtain the LOOCV estimate for the test error. Comment on the results.
+
+```{r}
+attach(Weekly)
+
+# a) 
+glm.fits.1=glm(Direction ~ Lag1+Lag2, data=Weekly ,family=binomial)
+summary(glm.fits.1)
+
+# b) 
+glm.fits.1=glm(Direction ~ Lag1+Lag2, data=Weekly[-1,] ,family=binomial)
+summary(glm.fits.1)
+
+# c) 
+glm.probs=predict(glm.fits.1,Weekly[1,],type="response")
+
+glm.probs # greater than 0.5, goes up 
+glm.probs <- ifelse(glm.probs > 0.5, "Up", "Down")
+glm.probs == Weekly[1,]$Direction # down # wrong prediction 
+ifelse(glm.probs == Weekly[1,]$Direction, 0, 1) 
+
+# d) 
+output <- 
+sapply(seq_along(1:nrow(Weekly)), function(i) {
+  fit <- glm(Direction ~ Lag1+Lag2, data=Weekly[-i,] ,family=binomial) 
+  probs<- predict(fit,Weekly[i,],type="response")
+  probs <- ifelse(probs > 0.5, "Up", "Down")
+  as.numeric(ifelse(probs == Weekly[i,]$Direction, 0, 1))
+})
+
+output 
+
+# e) 
+sum(output)/length(output) # 45% test error  
+``` 
+
+### 8 
+
+We will now perform cross-validation on a simulated data set.
+
+(a) Generate a simulated data set as follows:
+
+```{r}
+set.seed(1)
+x=rnorm(100)
+y=x-2*x^2+rnorm(100)
+```
+
+In this data set, what is n and what is p? Write out the model used to generate the data in equation form.
+
+(b) Create a scatterplot of X against Y . Comment on what you find.
+
+(c) Set a random seed, and then compute the LOOCV errors that result from fitting the following four models using least squares:
+         
+i. Y = β0 + β1X + ε
+
+ii. Y = β0 + β1X + β2X2 + ε
+
+iii. Y = β0 +β1X +β2X2 +β3X3 +ε
+
+iv. Y = β0 +β1X +β2X2 +β3X3 +β4X4 +ε.
+
+Note you may find it helpful to use the data.frame() function to create a single data set containing both X and Y .
+
+(d) Repeat (c) using another random seed, and report your results.
+Are your results the same as what you got in (c)? Why?
+
+(e) Which of the models in (c) had the smallest LOOCV error? Is this what you expected? Explain your answer.
+
+(f) Comment on the statistical significance of the coefficient esti- mates that results from fitting each of the models in (c) using least squares. Do these results agree with the conclusions drawn based on the cross-validation results? 
+
+```{r} 
+# a) 
+# n is 100, the sample size. p is the predictor, here it is x, only one p here.  
+
+# b) 
+plot(x, y)
+plot(x^2, y) # quadratic relationshop between x and y 
+
+# c) 
+set.seed(1)
+data <- data.frame(y = y, 
+                   x = x)
+data %>% dim()
+
+cv.error <- 
+sapply(c(1:4), function(i) {
+  glm.fit=glm(y~poly(x ,i),data=data)
+  cv.glm(data,glm.fit)$delta[1]
+})
+
+cv.error
+
+# d) 
+set.seed(2)
+data <- data.frame(y = y, 
+                   x = x)
+data %>% dim()
+
+cv.error <- 
+sapply(c(1:4), function(i) {
+  glm.fit=glm(y~poly(x ,i),data=data)
+  cv.glm(data,glm.fit)$delta[1]
+})
+
+cv.error
+
+# e) 
+# 2nd, because b) 
+
+# f) least square 
+
+fit.m1 <- lm(y ~ poly(x, degree= 1), data = data) 
+summary(fit.m1)
+
+fit.m2 <- lm(y ~ poly(x, degree= 2), data = data)
+summary(fit.m2)
+
+fit.m3 <- lm(y ~ poly(x, degree= 3), data = data)
+summary(fit.m3)
+
+fit.m4 <- lm(y ~ poly(x, degree= 4), data = data)
+summary(fit.m4)
+### forget how to get the best model using least squre method... 
+```
+
