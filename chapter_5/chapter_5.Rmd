@@ -2,7 +2,9 @@
 title: "chapter_5"
 author: "Ruijuan Li"
 date: "2/5/2018"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 ### 3 
