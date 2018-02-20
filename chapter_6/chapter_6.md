@@ -15,8 +15,8 @@ best subset appoach, because compared to forward and backward approach, it compa
 
 (b) Which of the three models with k predictors has the smallest test RSS?
 
-still best subset approach, because it looks for all combinations of k. 
-
+no answer... 
+ 
 (c) True or False:
 
 i. The predictors in the k-variable model identified by forward stepwise are a subset of the predictors in the (k+1)-variable model identified by forward stepwise selection.
@@ -164,15 +164,15 @@ summary(regfit.full)
 ## 1 subsets of each size up to 10
 ## Selection Algorithm: exhaustive
 ##           X1  X2  X3  X4  X5  X6  X7  X8  X9  X10
-## 1  ( 1 )  "*" " " " " " " " " " " " " " " " " " "
-## 2  ( 1 )  "*" " " "*" " " " " " " " " " " " " " "
-## 3  ( 1 )  " " " " "*" " " " " " " "*" " " " " "*"
-## 4  ( 1 )  " " "*" "*" " " " " " " "*" " " "*" " "
-## 5  ( 1 )  "*" "*" " " " " "*" " " "*" " " "*" " "
-## 6  ( 1 )  " " "*" "*" "*" " " "*" " " "*" " " "*"
-## 7  ( 1 )  " " "*" "*" "*" " " "*" "*" "*" "*" " "
-## 8  ( 1 )  "*" "*" " " "*" "*" "*" "*" "*" "*" " "
-## 9  ( 1 )  "*" "*" "*" "*" "*" "*" "*" "*" "*" " "
+## 1  ( 1 )  " " " " "*" " " " " " " " " " " " " " "
+## 2  ( 1 )  "*" " " " " " " "*" " " " " " " " " " "
+## 3  ( 1 )  "*" " " " " " " "*" "*" " " " " " " " "
+## 4  ( 1 )  "*" " " "*" " " "*" " " "*" " " " " " "
+## 5  ( 1 )  "*" " " "*" " " "*" " " "*" " " "*" " "
+## 6  ( 1 )  "*" " " "*" " " "*" " " "*" "*" "*" " "
+## 7  ( 1 )  "*" "*" "*" "*" "*" " " "*" " " "*" " "
+## 8  ( 1 )  "*" " " "*" "*" "*" "*" "*" " " "*" "*"
+## 9  ( 1 )  "*" "*" "*" "*" "*" "*" "*" "*" " " "*"
 ## 10  ( 1 ) "*" "*" "*" "*" "*" "*" "*" "*" "*" "*"
 ```
 
@@ -200,8 +200,8 @@ coef(regfit.full ,3)
 ```
 
 ```
-##   (Intercept)            X3            X7           X10 
-##  1.2957368455  0.4392652090 -0.0201964687  0.0007005078
+## (Intercept)          X1          X5          X6 
+## 1.070166116 0.491630529 0.028152742 0.002694951
 ```
 
 (d) Repeat (c), using forward stepwise selection and also using back- wards stepwise selection. How does your answer compare to the results in (c)?
@@ -233,8 +233,8 @@ coef(regfit.fwd ,1) # based on bic, the model with X1 is the best fit model
 ```
 
 ```
-## (Intercept)          X1 
-##   1.3412324   0.6889625
+## (Intercept)          X3 
+##   1.0593327   0.2648263
 ```
 
 ```r
@@ -260,10 +260,10 @@ coef(regfit.bwd ,5) # based on bic, this model is the best
 ```
 
 ```
-##  (Intercept)           X2           X5           X6           X7 
-##  1.221546185  0.085561338  0.348208736  0.002919731 -0.108943143 
-##           X9 
-##  0.008296917
+##  (Intercept)           X1           X3           X5           X6 
+##  1.068875671  1.145283322 -1.090998194  0.453603973  0.003699642 
+##           X7 
+## -0.045363966
 ```
 
 ```r

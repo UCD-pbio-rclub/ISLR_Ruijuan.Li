@@ -15,8 +15,8 @@ best subset appoach, because compared to forward and backward approach, it compa
 
 (b) Which of the three models with k predictors has the smallest test RSS?
 
-still best subset approach, because it looks for all combinations of k. 
-
+no answer... 
+ 
 (c) True or False:
 
 i. The predictors in the k-variable model identified by forward stepwise are a subset of the predictors in the (k+1)-variable model identified by forward stepwise selection.
