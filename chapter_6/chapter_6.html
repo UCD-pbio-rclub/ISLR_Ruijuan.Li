@@ -226,15 +226,15 @@ summary(regfit.full)</code></pre>
 ## 1 subsets of each size up to 10
 ## Selection Algorithm: exhaustive
 ##           X1  X2  X3  X4  X5  X6  X7  X8  X9  X10
-## 1  ( 1 )  &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
-## 2  ( 1 )  &quot; &quot; &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
-## 3  ( 1 )  &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;*&quot;
-## 4  ( 1 )  &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot;
-## 5  ( 1 )  &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot;
-## 6  ( 1 )  &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot;
-## 7  ( 1 )  &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot; &quot;
-## 8  ( 1 )  &quot; &quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot; &quot;
-## 9  ( 1 )  &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot; &quot;
+## 1  ( 1 )  &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 2  ( 1 )  &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 3  ( 1 )  &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot;
+## 4  ( 1 )  &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot;
+## 5  ( 1 )  &quot; &quot; &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot;*&quot; &quot;*&quot;
+## 6  ( 1 )  &quot; &quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot;
+## 7  ( 1 )  &quot; &quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot;*&quot; &quot;*&quot;
+## 8  ( 1 )  &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot;
+## 9  ( 1 )  &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot;
 ## 10  ( 1 ) &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot;*&quot;</code></pre>
 <pre class="r"><code>graphics.off() 
 
@@ -245,8 +245,8 @@ plot(regfit.full,scale=&quot;bic&quot;)
 
 # according to BIC, the model with X5, X7, and X9 is the best model. adjusted R square and cp gave different model based on their stats  
 coef(regfit.full ,3)</code></pre>
-<pre><code>##   (Intercept)            X1            X6           X10 
-##  0.9806199562  0.5550302890  0.0164863619 -0.0001788113</code></pre>
+<pre><code>##  (Intercept)           X3           X8          X10 
+##  1.050810982  0.273720520  0.017048798 -0.002800295</code></pre>
 <ol start="4" style="list-style-type: lower-alpha">
 <li>Repeat (c), using forward stepwise selection and also using back- wards stepwise selection. How does your answer compare to the results in (c)?</li>
 </ol>
@@ -254,21 +254,23 @@ coef(regfit.full ,3)</code></pre>
 regfit.bwd=regsubsets(Y~.,data=data.1,nvmax=11, method =&quot;backward&quot;) 
 
 graphics.off() 
-plot(regfit.fwd,scale=&quot;adjr2&quot;) 
+plot(regfit.fwd,scale=&quot;adjr2&quot;)  
 plot(regfit.fwd,scale=&quot;Cp&quot;)
 plot(regfit.fwd,scale=&quot;bic&quot;)  
 
 coef(regfit.fwd ,1) # based on bic, the model with X1 is the best fit model </code></pre>
-<pre><code>## (Intercept)          X1 
-##   1.0922685   0.6258577</code></pre>
+<pre><code>## (Intercept)          X3 
+##   1.1813435   0.2257952</code></pre>
 <pre class="r"><code>par(mfrow=c(3,1))
 plot(regfit.bwd,scale=&quot;adjr2&quot;) 
 plot(regfit.bwd,scale=&quot;Cp&quot;)
 plot(regfit.bwd,scale=&quot;bic&quot;) 
 
 coef(regfit.bwd ,5) # based on bic, this model is the best </code></pre>
-<pre><code>## (Intercept)          X2          X3          X5          X6          X8 
-##  0.94400906  0.07531988  0.34327488 -0.03653086  0.02850443 -0.00329446</code></pre>
+<pre><code>##  (Intercept)           X2           X3           X6           X8 
+##  1.199452190 -0.146398959  0.289916077 -0.066365214  0.049318059 
+##          X10 
+## -0.006238141</code></pre>
 <pre class="r"><code># both forward and backward gave different model compared to best subset approach. </code></pre>
 <div id="next-time" class="section level3">
 <h3>next time</h3>
