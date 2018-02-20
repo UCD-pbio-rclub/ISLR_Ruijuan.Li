@@ -4,7 +4,7 @@ author: "Ruijuan Li"
 date: "2/20/2018"
 output: 
   html_document: 
-    keep_md: yes
+    keep_md: yes 
 ---
 
 1. We perform best subset, forward stepwise, and backward stepwise selection on a single data set. For each approach, we obtain p + 1 models, containing 0, 1, 2, . . . , p predictors. Explain your answers:
@@ -21,11 +21,11 @@ still best subset approach, because it looks for all combinations of k.
 
 i. The predictors in the k-variable model identified by forward stepwise are a subset of the predictors in the (k+1)-variable model identified by forward stepwise selection.
 
-True 
+True  
 
 ii. The predictors in the k-variable model identified by back- ward stepwise are a subset of the predictors in the (k + 1)- variable model identified by backward stepwise selection.
 
-True 
+True  
 
 iii. The predictors in the k-variable model identified by back- ward stepwise are a subset of the predictors in the (k + 1)- variable model identified by forward stepwise selection.
 
@@ -164,33 +164,44 @@ summary(regfit.full)
 ## 1 subsets of each size up to 10
 ## Selection Algorithm: exhaustive
 ##           X1  X2  X3  X4  X5  X6  X7  X8  X9  X10
-## 1  ( 1 )  " " " " "*" " " " " " " " " " " " " " "
-## 2  ( 1 )  " " " " "*" " " "*" " " " " " " " " " "
-## 3  ( 1 )  " " " " "*" " " " " " " " " "*" " " "*"
-## 4  ( 1 )  " " " " "*" " " " " "*" " " "*" " " "*"
-## 5  ( 1 )  " " "*" "*" " " " " " " " " "*" "*" "*"
+## 1  ( 1 )  "*" " " " " " " " " " " " " " " " " " "
+## 2  ( 1 )  "*" " " "*" " " " " " " " " " " " " " "
+## 3  ( 1 )  " " " " "*" " " " " " " "*" " " " " "*"
+## 4  ( 1 )  " " "*" "*" " " " " " " "*" " " "*" " "
+## 5  ( 1 )  "*" "*" " " " " "*" " " "*" " " "*" " "
 ## 6  ( 1 )  " " "*" "*" "*" " " "*" " " "*" " " "*"
-## 7  ( 1 )  " " "*" "*" "*" " " "*" " " "*" "*" "*"
-## 8  ( 1 )  "*" "*" "*" "*" "*" "*" " " "*" " " "*"
-## 9  ( 1 )  "*" "*" "*" "*" "*" "*" "*" "*" " " "*"
+## 7  ( 1 )  " " "*" "*" "*" " " "*" "*" "*" "*" " "
+## 8  ( 1 )  "*" "*" " " "*" "*" "*" "*" "*" "*" " "
+## 9  ( 1 )  "*" "*" "*" "*" "*" "*" "*" "*" "*" " "
 ## 10  ( 1 ) "*" "*" "*" "*" "*" "*" "*" "*" "*" "*"
 ```
 
 ```r
-graphics.off() 
-
-par(mfrow=c(3,1))
 plot(regfit.full,scale="adjr2") 
+```
+
+![](chapter_6_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 plot(regfit.full,scale="Cp")
-plot(regfit.full,scale="bic") 
+```
 
+![](chapter_6_files/figure-html/unnamed-chunk-3-2.png)<!-- -->
+
+```r
+plot(regfit.full,scale="bic")   
+```
+
+![](chapter_6_files/figure-html/unnamed-chunk-3-3.png)<!-- -->
+
+```r
 # according to BIC, the model with X5, X7, and X9 is the best model. adjusted R square and cp gave different model based on their stats  
-coef(regfit.full ,3)
+coef(regfit.full ,3) 
 ```
 
 ```
-##  (Intercept)           X3           X8          X10 
-##  1.050810982  0.273720520  0.017048798 -0.002800295
+##   (Intercept)            X3            X7           X10 
+##  1.2957368455  0.4392652090 -0.0201964687  0.0007005078
 ```
 
 (d) Repeat (c), using forward stepwise selection and also using back- wards stepwise selection. How does your answer compare to the results in (c)?
@@ -200,33 +211,59 @@ coef(regfit.full ,3)
 regfit.fwd=regsubsets(Y~.,data=data.1,nvmax=11, method ="forward")
 regfit.bwd=regsubsets(Y~.,data=data.1,nvmax=11, method ="backward") 
 
-graphics.off() 
 plot(regfit.fwd,scale="adjr2")  
-plot(regfit.fwd,scale="Cp")
-plot(regfit.fwd,scale="bic")  
+```
 
+![](chapter_6_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+```r
+plot(regfit.fwd,scale="Cp")
+```
+
+![](chapter_6_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
+
+```r
+plot(regfit.fwd,scale="bic")   
+```
+
+![](chapter_6_files/figure-html/unnamed-chunk-4-3.png)<!-- -->
+
+```r
 coef(regfit.fwd ,1) # based on bic, the model with X1 is the best fit model 
 ```
 
 ```
-## (Intercept)          X3 
-##   1.1813435   0.2257952
+## (Intercept)          X1 
+##   1.3412324   0.6889625
 ```
 
 ```r
-par(mfrow=c(3,1))
 plot(regfit.bwd,scale="adjr2") 
-plot(regfit.bwd,scale="Cp")
-plot(regfit.bwd,scale="bic") 
+```
 
+![](chapter_6_files/figure-html/unnamed-chunk-4-4.png)<!-- -->
+
+```r
+plot(regfit.bwd,scale="Cp")
+```
+
+![](chapter_6_files/figure-html/unnamed-chunk-4-5.png)<!-- -->
+
+```r
+plot(regfit.bwd,scale="bic") 
+```
+
+![](chapter_6_files/figure-html/unnamed-chunk-4-6.png)<!-- -->
+
+```r
 coef(regfit.bwd ,5) # based on bic, this model is the best 
 ```
 
 ```
-##  (Intercept)           X2           X3           X6           X8 
-##  1.199452190 -0.146398959  0.289916077 -0.066365214  0.049318059 
-##          X10 
-## -0.006238141
+##  (Intercept)           X2           X5           X6           X7 
+##  1.221546185  0.085561338  0.348208736  0.002919731 -0.108943143 
+##           X9 
+##  0.008296917
 ```
 
 ```r
