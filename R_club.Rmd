@@ -463,3 +463,111 @@ plot(regfit.bwd,scale="bic")
 plot(regfit.fwd,scale="bic")
 ```
 
+### test error & ridge regression 
+```{r}
+### choosing among models using the validation set approach and cross-validataion 
+set.seed(1)
+library(ISLR)
+library(tidyverse)
+library(leaps)
+
+data(Hitters)
+train=sample(c(TRUE,FALSE), nrow(Hitters),rep=TRUE)
+test =(! train )
+
+train %>% length()
+dim(Hitters)
+length(test)
+
+regfit.best=regsubsets(Salary~.,data=Hitters[train,], nvmax =19) # best subset using only traning data 
+colnames(Hitters)
+test.mat<-model.matrix(Salary~.,data=Hitters[test,]) 
+sum(test)
+test.mat %>% dim() # 121 20, why 121?   
+test2 <- Hitters[test,] # 148 20 
+sum(!(rownames(test2) %in% rownames(test.mat))) 
+148-121 # why ??? 
+val.errors=rep(NA,19) 
+
+for(i in 1:19){
+coefi=coef(regfit.best,id=i)
+pred=test.mat[,names(coefi)]%*%coefi
+val.errors[i]=mean((Hitters$Salary[test]-pred)^2) }
+
+val.errors
+which.min(val.errors)
+coef(regfit.best ,10)
+
+predict.regsubsets =function (object ,newdata ,id ,...){
+form=as.formula(object$call [[2]])
+mat=model.matrix(form,newdata)
+coefi=coef(object ,id=id)
+xvars=names(coefi)
+mat[,xvars]%*%coefi } ### don't understand 
+
+regfit.best=regsubsets(Salary~.,data=Hitters ,nvmax=19)
+coef(regfit.best ,10)
+
+k=10
+set.seed(1)
+folds=sample(1:k,nrow(Hitters),replace=TRUE)
+folds
+nrow(Hitters)
+
+cv.errors=matrix(NA,k,19, dimnames=list(NULL, paste(1:19))) # row and colnames 
+cv.errors %>% dim() 
+?matrix 
+list(NULL, paste(1:19))
+cv.errors %>% colnames()
+
+for(j in 1:k){
+best.fit = regsubsets(Salary~., data = Hitters[folds!=j,], nvmax = 19)
+for (i in 1:19){
+pred=predict(best.fit,Hitters[folds==j,],id=i) 
+cv.errors[j,i]=mean( (Hitters$Salary[folds==j]-pred)^2)
+}
+} ### doesn't work... 
+
+mean.cv.errors=apply(cv.errors ,2,mean) 
+mean.cv.errors
+par(mfrow=c(1,1))
+plot(mean.cv.errors ,type='b')
+
+reg.best=regsubsets (Salary~.,data=Hitters , nvmax=19)
+coef(reg.best ,11)
+
+### ridge regression 
+x=model.matrix(Salary~.,Hitters)[,-1] 
+x %>% dim()  # 263... why !!!! 
+dim(Hitters) # why some rows were missing? 
+y=Hitters$Salary
+y %>% length()
+
+library(glmnet)
+grid=10^seq(10,-2,length=100)
+grid 
+seq(10,-2,length=100) 
+ridge.mod=glmnet(x,y,alpha=0,lambda=grid)
+
+dim(coef(ridge.mod))
+ridge.mod$lambda [50]
+coef(ridge.mod)[,50]
+sqrt(sum(coef(ridge.mod)[-1,50]^2))
+ridge.mod$lambda [60]
+coef(ridge.mod)[,60]
+sqrt(sum(coef(ridge.mod)[-1,60]^2))
+predict(ridge.mod,s=50,type="coefficients")[1:20,]
+set.seed(1)
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.test=y[test]
+
+ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid, thresh =1e-12)
+ridge.pred=predict(ridge.mod,s=4,newx=x[test,]) 
+mean((ridge.pred-y.test)^2)
+
+mean((mean(y[train])-y.test)^2)
+ridge.pred=predict(ridge.mod,s=1e10,newx=x[test,])
+mean((ridge.pred-y.test)^2) 
+```
+

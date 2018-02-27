@@ -1,0 +1,95 @@
+---
+title: "chapter_6_2"
+author: "Ruijuan Li"
+date: "2/26/2018"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+### 3
+
+a) think this as the RSS for linear regression, as s is increased from 0, more and more predictors can be added to the model, so training error will decrease steadily and flatten out. 
+
+b) test RSS will decrease and then flattern out almost, as training RSS. 
+
+c) variance: Variance refers to your algorithm's sensitivity to specific sets of training data. is an error from sensitivity to small fluctuations in the training set. as s is increased from 0, more predictors are added to the model, variance will increase (sensitivity increase --> overfitting)   
+
+d) (squared) bias: Bias is the difference between your model's expected predictions and the true values. The bias is an error from erroneous assumptions in the learning algorithm. High bias can cause an algorithm to miss the relevant relations between features and target outputs (underfitting). As more and more predictors added, bias will decrease (generalization decrease --> underfitting) 
+
+e) irreducible error: is also known as "noise," and it can't be reduced by your choice in algorithm. It typically comes from inherent randomness, a mis-framed problem, or an incomplete feature set. so it remaines constant.  
+
+### 4 
+
+This is the case for ridge regression 
+
+a) training RSS. as lambda is increasing, the impact of the shrinkage penalty grows, and the ridge regression coefficient estimates will approach zero, training RSS will increase and then flatten out (as the model is becoming less and less sensitive to the training data, less and less flexible) 
+
+b) test RSS will decrease (as model is becoming more and more generalized to fit on the test dataset) and then increase (as many predictors are shrinked to have coefficient of zero), form a U shape.  
+
+c) variance will decrease as lamba increases, because the sensitivity decreases. 
+
+d) bias will increase because the model is more generalized. 
+
+e) irreducible error doesn't change 
+
+### 5 
+
+a) (y1 − β1x11 − β2x12)^2 + (y2 − β1x21 − β2x22)^2 + λ(β1^2 + β2^2).
+
+b) see https://www.mathstat.dal.ca/~aarms2014/StatLearn/assignments/A3sol_2.pdf 
+
+### 9 
+
+```{r}
+library(tidyverse)
+library(ISLR)
+library(leaps)
+
+# a) 
+dim(College)
+colnames(College)
+set.seed(1)
+train=sample(c(TRUE,FALSE), nrow(College),rep=TRUE)
+test =(! train )
+
+# b) fit the model using least square on the training set, and report the test error obtained.
+# least square (linear regression, using best subset method) 
+regfit.best=regsubsets(Apps~.,data=College[train,], nvmax =17) # best subset using only traning data 
+plot(regfit.best,scale="bic") # why not using this method??? 
+
+test.mat<-model.matrix(Apps~.,data=College[test,]) 
+dim(test.mat)
+sum(test)
+
+val.errors=rep(NA,17) 
+
+for(i in 1:17){
+coefi=coef(regfit.best,id=i)
+pred=test.mat[,names(coefi)]%*%coefi
+val.errors[i]=mean((College$Apps[test]-pred)^2) }
+
+val.errors
+which.min(val.errors) # 14 predictors 
+val.errors[which.min(val.errors)] # test error ??? 
+coef(regfit.best, 5)  
+
+# c) Fit a ridge regression model on the training set, with λ chosen by cross-validation. Report the test error obtained. 
+
+library(glmnet) 
+
+### fit ridge regression on training set 
+grid=10^seq(10,-2,length=100)
+x = model.matrix(Apps~.,data=College[train,])
+dim(x)  # 
+y = College$Apps[train]
+length(y)
+
+ridge.mod=glmnet(x, y, alpha=0,lambda=grid, thresh =1e-12)
+dim(coef(ridge.mod))
+
+### cross-validation to choose lamda 
+
+### test error on test data set 
+```
+

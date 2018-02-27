@@ -15,7 +15,7 @@ best subset appoach, because compared to forward and backward approach, it compa
 
 (b) Which of the three models with k predictors has the smallest test RSS?
 
-no answer... 
+no answer...  
  
 (c) True or False:
 
