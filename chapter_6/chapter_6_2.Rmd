@@ -50,7 +50,7 @@ library(leaps)
 dim(College)
 colnames(College)
 set.seed(1)
-train=sample(c(TRUE,FALSE), nrow(College),rep=TRUE)
+train=sample(c(TRUE,FALSE), nrow(College),rep=TRUE) 
 test =(! train )
 
 # b) fit the model using least square on the training set, and report the test error obtained.
@@ -80,16 +80,23 @@ library(glmnet)
 
 ### fit ridge regression on training set 
 grid=10^seq(10,-2,length=100)
-x = model.matrix(Apps~.,data=College[train,])
+x = model.matrix(Apps~.,data=College)
 dim(x)  # 
-y = College$Apps[train]
+y = College$Apps
 length(y)
 
-ridge.mod=glmnet(x, y, alpha=0,lambda=grid, thresh =1e-12)
+ridge.mod=glmnet(x[train,], y[train], alpha=0,lambda=grid, thresh =1e-12)
 dim(coef(ridge.mod))
 
 ### cross-validation to choose lamda 
-
+set.seed (1)
+cv.out=cv.glmnet(x[test ,],y[test],alpha=0)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+bestlam # 418 
 ### test error on test data set 
+
+ridge.pred=predict(ridge.mod,s=bestlam ,newx=x[test,]) 
+mean((ridge.pred-y[test])^2) ### very high which might due to the spliting of test and training set.    
 ```
 

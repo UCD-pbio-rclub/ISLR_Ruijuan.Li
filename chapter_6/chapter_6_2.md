@@ -117,7 +117,7 @@ colnames(College)
 
 ```r
 set.seed(1)
-train=sample(c(TRUE,FALSE), nrow(College),rep=TRUE)
+train=sample(c(TRUE,FALSE), nrow(College),rep=TRUE) 
 test =(! train )
 
 # b) fit the model using least square on the training set, and report the test error obtained.
@@ -244,25 +244,25 @@ library(glmnet)
 ```r
 ### fit ridge regression on training set 
 grid=10^seq(10,-2,length=100)
-x = model.matrix(Apps~.,data=College[train,])
+x = model.matrix(Apps~.,data=College)
 dim(x)  # 
 ```
 
 ```
-## [1] 400  18
+## [1] 777  18
 ```
 
 ```r
-y = College$Apps[train]
+y = College$Apps
 length(y)
 ```
 
 ```
-## [1] 400
+## [1] 777
 ```
 
 ```r
-ridge.mod=glmnet(x, y, alpha=0,lambda=grid, thresh =1e-12)
+ridge.mod=glmnet(x[train,], y[train], alpha=0,lambda=grid, thresh =1e-12)
 dim(coef(ridge.mod))
 ```
 
@@ -272,7 +272,30 @@ dim(coef(ridge.mod))
 
 ```r
 ### cross-validation to choose lamda 
+set.seed (1)
+cv.out=cv.glmnet(x[test ,],y[test],alpha=0)
+plot(cv.out)
+```
 
+![](chapter_6_2_files/figure-html/unnamed-chunk-1-2.png)<!-- -->
+
+```r
+bestlam=cv.out$lambda.min
+bestlam # 418 
+```
+
+```
+## [1] 418.4332
+```
+
+```r
 ### test error on test data set 
+
+ridge.pred=predict(ridge.mod,s=bestlam ,newx=x[test,]) 
+mean((ridge.pred-y[test])^2) ### very high which might due to the spliting of test and training set.    
+```
+
+```
+## [1] 2628993
 ```
 
