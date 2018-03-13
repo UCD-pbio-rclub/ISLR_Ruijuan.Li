@@ -351,10 +351,10 @@ validationplot(pcr.fit,val.type="MSEP")
 ![](chapter_6_2_files/figure-html/unnamed-chunk-1-3.png)<!-- -->
 
 ```r
-pcr.pred=predict(pcr.fit, x[test,], ncomp=5) 
+pcr.pred=predict(pcr.fit, x[test,], ncomp=3) 
 test.error.pcr <- mean((pcr.pred-y[test])^2) ### doesn't work, due to NA 
 
-pcr.fit=pcr(Apps~., data=College,scale=TRUE,ncomp=5)
+pcr.fit=pcr(Apps~., data=College,scale=TRUE,ncomp=3)
 summary(pcr.fit) 
 ```
 
@@ -362,11 +362,11 @@ summary(pcr.fit)
 ## Data: 	X dimension: 777 17 
 ## 	Y dimension: 777 1
 ## Fit method: svdpc
-## Number of components considered: 5
+## Number of components considered: 3
 ## TRAINING: % variance explained
-##       1 comps  2 comps  3 comps  4 comps  5 comps
-## X      31.670    57.30    64.30    69.90    75.39
-## Apps    2.316    73.06    73.07    82.08    84.08
+##       1 comps  2 comps  3 comps
+## X      31.670    57.30    64.30
+## Apps    2.316    73.06    73.07
 ```
 
 ```r
@@ -453,7 +453,7 @@ test.error.pcr
 ```
 
 ```
-## [1] 3519875
+## [1] 5550505
 ```
 
 ```r

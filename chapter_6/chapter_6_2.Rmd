@@ -108,10 +108,10 @@ pcr.fit=pcr(Apps~., data=College,subset=train,scale=TRUE, validation ="CV")
 summary(pcr.fit)
 validationplot(pcr.fit,val.type="MSEP")
 
-pcr.pred=predict(pcr.fit, x[test,], ncomp=5) 
+pcr.pred=predict(pcr.fit, x[test,], ncomp=3) 
 test.error.pcr <- mean((pcr.pred-y[test])^2) ### doesn't work, due to NA 
 
-pcr.fit=pcr(Apps~., data=College,scale=TRUE,ncomp=5)
+pcr.fit=pcr(Apps~., data=College,scale=TRUE,ncomp=3)
 summary(pcr.fit) 
 
 # f) Fit a PLS model on the training set, with M chosen by cross- validation. Report the test error obtained, along with the value of M selected by cross-validation.
