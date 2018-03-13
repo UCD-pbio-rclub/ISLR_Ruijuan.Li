@@ -571,3 +571,50 @@ ridge.pred=predict(ridge.mod,s=1e10,newx=x[test,])
 mean((ridge.pred-y.test)^2) 
 ```
 
+### PCA, dimension reduction 
+```{r}
+library(tidyverse)
+data(Hitters)
+library(pls)
+library(ISLR) 
+dim(Hitters) # 322 20 
+
+# use on all data 
+set.seed(2)
+pcr.fit=pcr(Salary~., data=Hitters ,scale=TRUE, validation ="CV")
+summary(pcr.fit)
+
+validationplot(pcr.fit,val.type="MSEP")
+
+### training test data 
+set.seed(1)
+train=sample(c(TRUE,FALSE), nrow(Hitters),rep=TRUE)
+test =(!train)
+pcr.fit=pcr(Salary~., data=Hitters,subset=train,scale=TRUE, validation ="CV")
+summary(pcr.fit)
+validationplot(pcr.fit,val.type="MSEP")
+
+# check test data 
+?predict
+pcr.pred=predict(pcr.fit, Hitters[test,], ncomp=7) 
+mean((pcr.pred-Hitters[test,]$Salary)^2) ### doesn't work, due to NA 
+
+# decided the best ncomp & use it on all data 
+pcr.fit=pcr(Salary~., data=Hitters,scale=TRUE,ncomp=7)
+summary(pcr.fit) 
+
+### PLS 
+set.seed(1)
+pls.fit=plsr(Salary~.,data = Hitters, subset=train, scale = T, validation ="CV")
+summary(pls.fit)
+
+validationplot(pls.fit,val.type="MSEP")
+
+### need to check 
+# pls.pred=predict(pls.fit,Hitters[test,],ncomp=2) 
+# mean((pls.pred-Hitters[test,]$Salary)^2) 
+
+pls.fit=plsr(Salary~., data=Hitters ,scale=TRUE,ncomp=2) 
+summary(pls.fit) 
+```
+

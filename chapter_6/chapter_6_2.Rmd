@@ -45,7 +45,8 @@ b) see https://www.mathstat.dal.ca/~aarms2014/StatLearn/assignments/A3sol_2.pdf
 library(tidyverse)
 library(ISLR)
 library(leaps)
-
+library(pls)
+ 
 # a) 
 dim(College)
 colnames(College)
@@ -70,8 +71,8 @@ pred=test.mat[,names(coefi)]%*%coefi
 val.errors[i]=mean((College$Apps[test]-pred)^2) }
 
 val.errors
-which.min(val.errors) # 14 predictors 
-val.errors[which.min(val.errors)] # test error ??? 
+which.min(val.errors) # 5 predictors 
+test.error.bestsubset <- val.errors[which.min(val.errors)] # test error ???  
 coef(regfit.best, 5)  
 
 # c) Fit a ridge regression model on the training set, with λ chosen by cross-validation. Report the test error obtained. 
@@ -80,8 +81,7 @@ library(glmnet)
 
 ### fit ridge regression on training set 
 grid=10^seq(10,-2,length=100)
-x = model.matrix(Apps~.,data=College)
-dim(x)  # 
+x = model.matrix(Apps~.,data=College)[,-1] # need to understand model.matrix ... 
 y = College$Apps
 length(y)
 
@@ -97,6 +97,114 @@ bestlam # 418
 ### test error on test data set 
 
 ridge.pred=predict(ridge.mod,s=bestlam ,newx=x[test,]) 
-mean((ridge.pred-y[test])^2) ### very high which might due to the spliting of test and training set.    
+test.error.ridge <- mean((ridge.pred-y[test])^2) ### very high which might due to the spliting of test and training set.      
+
+# d) skipped, come back later 
+
+# e) Fit a PCR model on the training set, with M chosen by cross- validation. Report the test error obtained, along with the value of M selected by cross-validation.
+dim(College) # 777 18 
+set.seed(1)
+pcr.fit=pcr(Apps~., data=College,subset=train,scale=TRUE, validation ="CV")
+summary(pcr.fit)
+validationplot(pcr.fit,val.type="MSEP")
+
+pcr.pred=predict(pcr.fit, x[test,], ncomp=5) 
+test.error.pcr <- mean((pcr.pred-y[test])^2) ### doesn't work, due to NA 
+
+pcr.fit=pcr(Apps~., data=College,scale=TRUE,ncomp=5)
+summary(pcr.fit) 
+
+# f) Fit a PLS model on the training set, with M chosen by cross- validation. Report the test error obtained, along with the value of M selected by cross-validation.
+set.seed(1)
+pls.fit=plsr(Apps~.,data = College, subset=train, scale = T, validation ="CV")
+summary(pls.fit)
+
+validationplot(pls.fit,val.type="MSEP")
+
+pls.pred=predict(pls.fit, x[test,], ncomp=3) # 3 or 4? 
+test.error.PLS <- mean((pls.pred-y[test])^2) ### doesn't work, due to NA 
+
+pls.fit=plsr(Apps~., data=College ,scale=TRUE,ncomp=3) 
+summary(pls.fit) 
+
+# g) Comment on the results obtained. How accurately can we pre- dict the number of college applications received? Is there much difference among the test errors resulting from these five ap- proaches? 
+test.error.bestsubset
+test.error.ridge
+test.error.pcr
+test.error.PLS 
+```
+
+### 11. 
+We will now try to predict per capita crime rate in the Boston data set. 
+```{r}
+# (a) Try out some of the regression methods explored in this chapter, such as best subset selection, the lasso, ridge regression, and PCR. Present and discuss results for the approaches that you consider.
+library(MASS)
+Boston %>% dim()
+Boston %>% colnames()
+
+# model matrix
+x = model.matrix(crim~.,data=Boston)[,-1] # need to understand model.matrix ... 
+y = Boston$crim
+length(y)
+
+# training & test set 
+set.seed(1)
+train=sample(c(TRUE,FALSE), nrow(Boston),rep=TRUE) 
+test =(! train )
+
+# best subset 
+regfit.best=regsubsets(crim~.,data=Boston[train,], nvmax =13) # best subset using only traning data 
+plot(regfit.best,scale="bic") # p = 2
+# need to calculate test error 
+
+# ridge 
+grid=10^seq(10,-2,length=100)
+ridge.mod=glmnet(x[train,], y[train], alpha=0,lambda=grid, thresh =1e-12)
+dim(coef(ridge.mod))
+
+### cross-validation to choose lamda 
+set.seed(1)
+cv.out=cv.glmnet(x[test ,],y[test],alpha=0)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+bestlam 
+### test error on test data set 
+ridge.pred=predict(ridge.mod,s=bestlam ,newx=x[test,]) 
+test.error.ridge <- mean((ridge.pred-y[test])^2) 
+test.error.ridge
+
+# PCR 
+pcr.fit=pcr(crim~., data=Boston,subset=train,scale=TRUE, validation ="CV")
+summary(pcr.fit)
+validationplot(pcr.fit,val.type="MSEP")
+
+pcr.pred=predict(pcr.fit, x[test,], ncomp=8) 
+test.error.pcr <- mean((pcr.pred-y[test])^2) ### doesn't work, due to NA 
+test.error.pcr
+
+pcr.fit=pcr(crim~., data=Boston,scale=TRUE,ncomp=8)
+summary(pcr.fit) 
+
+### PLS 
+pls.fit=plsr(crim~., data=Boston,subset=train,scale=TRUE, validation ="CV")
+summary(pls.fit)
+validationplot(pls.fit,val.type="MSEP")
+
+pls.pred=predict(pls.fit, x[test,], ncomp=3) 
+test.error.pls <- mean((pls.pred-y[test])^2) ### doesn't work, due to NA 
+test.error.pls
+
+pls.fit=plsr(crim~., data=Boston,scale=TRUE,ncomp=3)
+summary(pls.fit) 
+
+# (b) Propose a model (or set of models) that seem to perform well on this data set, and justify your answer. Make sure that you are evaluating model performance using validation set error, cross- validation, or some other reasonable alternative, as opposed to using training error.
+test.error.ridge
+test.error.pcr
+test.error.pls
+
+# PCR because it gave the smallest test error with only 3 components  
+
+# (c) Does your chosen model involve all of the features in the data set? Why or why not? 
+# no, only 8 components.   
 ```
 
