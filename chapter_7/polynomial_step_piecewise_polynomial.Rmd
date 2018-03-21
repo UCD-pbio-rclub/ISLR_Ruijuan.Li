@@ -2,7 +2,9 @@
 title: "Chapter_7_polynoimial_step_piecewise_polynomial"
 author: "Ruijuan Li"
 date: "3/21/2018"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 ### 6 
