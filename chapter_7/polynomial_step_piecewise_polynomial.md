@@ -97,63 +97,42 @@ matlines(age.grid,se.bands,lwd=1,col="blue",lty=3) # add CI line
 ```r
 # cv, for each cut from 2 to 6, run 10 times validation set test, each validation set start with a different seed 
 # make a function 
-cv.k10.step <- function(Wage, cut_number){
-for (i in 1:10){ # k level 
-set.seed(i)
-train_ID <- sample(rownames(Wage), size = round(nrow(Wage) * 0.5), replace = F) 
-train <- Wage[rownames(Wage) %in% train_ID,]
-test <- Wage[!(rownames(Wage) %in% train_ID),] 
-
-table(cut(train$age,cut_number)) # cut pick cutpoint automatically or specify cut point using breaks 
-fit=lm(wage~cut(train$age,cut_number),data=train) 
-agelims=range(train$age)
-age.grid=seq(from=agelims[1],to=agelims[2])
-preds=predict(fit,newdata=list(age=age.grid),se=TRUE) # predict
-cv.error[i] <- mean((test$wage-preds$fit)^2)
-}  
-mean(cv.error)} 
-
-# run cv on step function, cut from 2 to 6
-cv.error=rep(0,5)
-for (i in 2:6){
-cv.error[i]=cv.k10.step(Wage, i)}
-
-cv.error ### doesn't look right.... 
+deltas <- rep(NA, 9)
+for (i in 2:10) {
+    Wage$age.cut <- cut(Wage$age, i) 
+    fit <- glm(wage ~ age.cut, data = Wage)
+    deltas[i-1] <- cv.glm(Wage, fit, K = 10)$delta[1] ### 
+    names(deltas)[i-1] <- paste0("Cuts = ", i-1)
+}
+deltas
 ```
 
 ```
-## [1]    0.000 1724.302 1774.685 1824.554 1830.562 1841.501
+## Cuts = 1 Cuts = 2 Cuts = 3 Cuts = 4 Cuts = 5 Cuts = 6 Cuts = 7 Cuts = 8 
+## 1733.324 1682.910 1636.728 1634.090 1625.221 1612.427 1602.081 1610.365 
+## Cuts = 9 
+## 1606.912
 ```
 
 ```r
-# fit step function directly using cut number of 4
-fit=lm(wage~cut(age ,4),data=Wage) 
-coef(summary(fit))
+plot(1:9, deltas, xlab = "Cuts", ylab = "Test MSE", type = "l")
+(d.min <- which.min(deltas))
 ```
 
 ```
-##                         Estimate Std. Error   t value     Pr(>|t|)
-## (Intercept)            94.158392   1.476069 63.789970 0.000000e+00
-## cut(age, 4)(33.5,49]   24.053491   1.829431 13.148074 1.982315e-38
-## cut(age, 4)(49,64.5]   23.664559   2.067958 11.443444 1.040750e-29
-## cut(age, 4)(64.5,80.1]  7.640592   4.987424  1.531972 1.256350e-01
+## Cuts = 7 
+##        7
 ```
 
 ```r
-# predict 
-agelims=range(Wage$age)
-age.grid=seq(from=agelims[1],to=agelims[2])
-preds=predict(fit,newdata=list(age=age.grid),se=TRUE) # predict
-se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit ) # predict +/- 2se
-
-# plot the fit result 
-plot(Wage$age,Wage$wage,xlim=agelims ,cex=.5,col="darkgrey") # plot the value
-title("Step fit ",outer=T) # title 
-lines(age.grid,preds$fit,lwd=2,col="blue") # add fit line 
-matlines(age.grid,se.bands,lwd=1,col="blue",lty=3) # add CI line  
+points(d.min, deltas[d.min], col = "red", cex = 2, pch = 20)   
 ```
 
 ![](polynomial_step_piecewise_polynomial_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
+# check this  
+```
 
 ### 7 
 
@@ -162,13 +141,13 @@ The Wage data set contains a number of other features not explored in this chapt
 
 ```r
 library(ISLR) 
-colnames(Wage) 
+colnames(Wage)  
 ```
 
 ```
 ##  [1] "year"       "age"        "maritl"     "race"       "education" 
 ##  [6] "region"     "jobclass"   "health"     "health_ins" "logwage"   
-## [11] "wage"
+## [11] "wage"       "age.cut"
 ```
 
 ```r
@@ -204,7 +183,7 @@ coef(summary(fit))
 
 ```r
 # predict 
-agelims=range(Wage$maritl)
+agelims=range(Wage$maritl) 
 age.grid=seq(from=agelims[1],to=agelims[2])
 preds=predict(fit,newdata=list(maritl=age.grid),se=TRUE) # predict
 se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit ) # predict +/- 2se

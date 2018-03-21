@@ -54,44 +54,19 @@ matlines(age.grid,se.bands,lwd=1,col="blue",lty=3) # add CI line
 ```{r}
 # cv, for each cut from 2 to 6, run 10 times validation set test, each validation set start with a different seed 
 # make a function 
-cv.k10.step <- function(Wage, cut_number){
-for (i in 1:10){ # k level 
-set.seed(i)
-train_ID <- sample(rownames(Wage), size = round(nrow(Wage) * 0.5), replace = F) 
-train <- Wage[rownames(Wage) %in% train_ID,]
-test <- Wage[!(rownames(Wage) %in% train_ID),] 
+deltas <- rep(NA, 9)
+for (i in 2:10) {
+    Wage$age.cut <- cut(Wage$age, i) 
+    fit <- glm(wage ~ age.cut, data = Wage)
+    deltas[i-1] <- cv.glm(Wage, fit, K = 10)$delta[1] ### 
+    names(deltas)[i-1] <- paste0("Cuts = ", i-1)
+}
+deltas
+plot(1:9, deltas, xlab = "Cuts", ylab = "Test MSE", type = "l")
+(d.min <- which.min(deltas))
+points(d.min, deltas[d.min], col = "red", cex = 2, pch = 20)   
 
-table(cut(train$age,cut_number)) # cut pick cutpoint automatically or specify cut point using breaks 
-fit=lm(wage~cut(train$age,cut_number),data=train) 
-agelims=range(train$age)
-age.grid=seq(from=agelims[1],to=agelims[2])
-preds=predict(fit,newdata=list(age=age.grid),se=TRUE) # predict
-cv.error[i] <- mean((test$wage-preds$fit)^2)
-}  
-mean(cv.error)} 
-
-# run cv on step function, cut from 2 to 6
-cv.error=rep(0,5)
-for (i in 2:6){
-cv.error[i]=cv.k10.step(Wage, i)}
-
-cv.error ### doesn't look right.... 
-
-# fit step function directly using cut number of 4
-fit=lm(wage~cut(age ,4),data=Wage) 
-coef(summary(fit))
-
-# predict 
-agelims=range(Wage$age)
-age.grid=seq(from=agelims[1],to=agelims[2])
-preds=predict(fit,newdata=list(age=age.grid),se=TRUE) # predict
-se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit ) # predict +/- 2se
-
-# plot the fit result 
-plot(Wage$age,Wage$wage,xlim=agelims ,cex=.5,col="darkgrey") # plot the value
-title("Step fit ",outer=T) # title 
-lines(age.grid,preds$fit,lwd=2,col="blue") # add fit line 
-matlines(age.grid,se.bands,lwd=1,col="blue",lty=3) # add CI line  
+# check this  
 ```
 
 ### 7 
@@ -100,7 +75,7 @@ The Wage data set contains a number of other features not explored in this chapt
 
 ```{r}
 library(ISLR) 
-colnames(Wage) 
+colnames(Wage)  
 pairs(Wage)
 
 Wage$maritl <- as.numeric(Wage$maritl)
@@ -110,7 +85,7 @@ fit=lm(wage~cut(maritl ,4),data=Wage)
 coef(summary(fit))
 
 # predict 
-agelims=range(Wage$maritl)
+agelims=range(Wage$maritl) 
 age.grid=seq(from=agelims[1],to=agelims[2])
 preds=predict(fit,newdata=list(maritl=age.grid),se=TRUE) # predict
 se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit ) # predict +/- 2se
