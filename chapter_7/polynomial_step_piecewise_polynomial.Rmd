@@ -1,0 +1,232 @@
+---
+title: "Chapter_7_polynoimial_step_piecewise_polynomial"
+author: "Ruijuan Li"
+date: "3/21/2018"
+output: html_document
+---
+
+### 6 
+
+6. In this exercise, you will further analyze the Wage data set considered throughout this chapter.
+
+(a) Perform polynomial regression to predict wage using age. Use cross-validation to select the optimal degree d for the polynomial. What degree was chosen, and how does this compare to the results of hypothesis testing using ANOVA? Make a plot of the resulting polynomial fit to the data.
+
+```{r}
+# library(tidyverse)
+library(ISLR)
+
+# fit model with different degrees, and use anova 
+fit.1=lm(wage~age,data=Wage)
+fit.2=lm(wage~poly(age,2),data=Wage) 
+fit.3=lm(wage~poly(age,3),data=Wage) 
+fit.4=lm(wage~poly(age,4),data=Wage) 
+fit.5=lm(wage~poly(age,5),data=Wage) 
+anova(fit.1,fit.2,fit.3,fit.4,fit.5) # degree three I prefer 
+
+# use cross validation 
+library(boot)
+set.seed(1)
+cv.error.10=rep(0,5) 
+for (i in 1:5){
+glm.fit=glm(wage~poly(age ,i),data=Wage) 
+cv.error.10[i]=cv.glm(Wage,glm.fit,K=10)$delta[1] # 10 fold CV 
+} 
+cv.error.10 # degree four is the best 
+
+# make a plot for polynomial, I prefer result from cv 
+# get predict 
+agelims=range(Wage$age)
+age.grid=seq(from=agelims[1],to=agelims[2])
+preds=predict(fit.3,newdata=list(age=age.grid),se=TRUE) # predict
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit ) # predict +/- 2se
+
+# plot 
+plot(Wage$age,Wage$wage,xlim=agelims ,cex=.5,col="darkgrey") # plot the value
+title("Degree -4 Polynomial ",outer=T) # title 
+lines(age.grid,preds$fit,lwd=2,col="blue") # add fit line 
+matlines(age.grid,se.bands,lwd=1,col="blue",lty=3) # add CI line 
+```
+
+(b) Fit a step function to predict wage using age, and perform cross- validation to choose the optimal number of cuts. Make a plot of the fit obtained.
+
+```{r}
+# cv, for each cut from 2 to 6, run 10 times validation set test, each validation set start with a different seed 
+# make a function 
+cv.k10.step <- function(Wage, cut_number){
+for (i in 1:10){ # k level 
+set.seed(i)
+train_ID <- sample(rownames(Wage), size = round(nrow(Wage) * 0.5), replace = F) 
+train <- Wage[rownames(Wage) %in% train_ID,]
+test <- Wage[!(rownames(Wage) %in% train_ID),] 
+
+table(cut(train$age,cut_number)) # cut pick cutpoint automatically or specify cut point using breaks 
+fit=lm(wage~cut(train$age,cut_number),data=train) 
+agelims=range(train$age)
+age.grid=seq(from=agelims[1],to=agelims[2])
+preds=predict(fit,newdata=list(age=age.grid),se=TRUE) # predict
+cv.error[i] <- mean((test$wage-preds$fit)^2)
+}  
+mean(cv.error)} 
+
+# run cv on step function, cut from 2 to 6
+cv.error=rep(0,5)
+for (i in 2:6){
+cv.error[i]=cv.k10.step(Wage, i)}
+
+cv.error ### doesn't look right.... 
+
+# fit step function directly using cut number of 4
+fit=lm(wage~cut(age ,4),data=Wage) 
+coef(summary(fit))
+
+# predict 
+agelims=range(Wage$age)
+age.grid=seq(from=agelims[1],to=agelims[2])
+preds=predict(fit,newdata=list(age=age.grid),se=TRUE) # predict
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit ) # predict +/- 2se
+
+# plot the fit result 
+plot(Wage$age,Wage$wage,xlim=agelims ,cex=.5,col="darkgrey") # plot the value
+title("Step fit ",outer=T) # title 
+lines(age.grid,preds$fit,lwd=2,col="blue") # add fit line 
+matlines(age.grid,se.bands,lwd=1,col="blue",lty=3) # add CI line  
+```
+
+### 7 
+
+The Wage data set contains a number of other features not explored in this chapter, such as marital status (maritl), job class (jobclass), and others. Explore the relationships between some of these other predictors and wage, and use non-linear fitting techniques in order to fit flexible models to the data. Create plots of the results obtained, and write a summary of your findings.
+
+```{r}
+library(ISLR)
+colnames(Wage)
+Wage$maritl 
+pairs(Wage)
+
+Wage$maritl <- as.numeric(Wage$maritl)
+# use maritial status to predict wage, categorical predictor, I decided to use step function  
+table(cut(Wage$maritl,4)) # cut pick cutpoint automatically or specify cut point using breaks 
+fit=lm(wage~cut(maritl ,4),data=Wage) 
+coef(summary(fit))
+
+# predict 
+agelims=range(Wage$maritl)
+age.grid=seq(from=agelims[1],to=agelims[2])
+preds=predict(fit,newdata=list(maritl=age.grid),se=TRUE) # predict
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit ) # predict +/- 2se
+
+# plot the fit result 
+plot(Wage$maritl,Wage$wage,xlim=agelims ,cex=.5,col="darkgrey") # plot the value
+title("Step fit marital ",outer=T) # title 
+lines(age.grid,preds$fit,lwd=2,col="blue") # add fit line 
+matlines(age.grid,se.bands,lwd=1,col="blue",lty=3) # add CI line  
+
+# to make money, either don't marry or be married for ever 
+# 1. Never Married 2. Married 3. Widowed 4. Divorced 5. Separated maybe this level, need to check 
+```
+
+### 8 
+
+Fit some of the non-linear models investigated in this chapter to the Auto data set. Is there evidence for non-linear relationships in this data set? Create some informative plots to justify your answer.
+
+```{r}
+colnames(Auto) 
+
+# I would like to invesitigate the relationship between origin and mpg, hypothesis, Japanese car has a higher mpg, origin matters 
+
+# polynomial 
+fit=lm(mpg~poly(origin,2),data=Auto) 
+summary(fit) # degree of two 
+
+# step 
+table(cut(Auto$origin, breaks = 4)) # cut pick cutpoint automatically or specify cut point using breaks 
+fit=lm(mpg~cut(origin ,4),data=Auto)  
+coef(summary(fit))
+
+# predict 
+agelims=range(Auto$origin)
+age.grid=seq(from=agelims[1],to=agelims[2])
+preds=predict(fit,newdata=list(origin=age.grid),se=TRUE) # predict
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit ) # predict +/- 2se
+
+# plot the fit result 
+plot(Auto$origin,Auto$mpg,xlim=agelims ,cex=.5,col="darkgrey") # plot the value
+title("Step fit mpg vs. origin ",outer=T) # title 
+lines(age.grid,preds$fit,lwd=2,col="blue") # add fit line 
+matlines(age.grid,se.bands,lwd=1,col="blue",lty=3) # add CI line, origin matters 
+
+# splines 
+library(splines)
+fit=lm(mpg~bs(origin,knots=c(1,2,3)),data=Auto) # specify knots at 25, 40, and 60 
+pred.splines=predict(fit,newdata=list(origin=age.grid),se=T)
+pred.splines 
+
+plot(Auto$origin,Auto$mpg,col="gray")
+lines(age.grid,pred.splines$fit,lwd=2)
+lines(age.grid,pred.splines$fit+2*pred.splines$se ,lty="dashed")
+lines(age.grid,pred.splines$fit-2*pred.splines$se ,lty="dashed")
+
+# natural splines
+fit2=lm(mpg~ns(origin,df=4),data=Auto)
+pred2=predict(fit2,newdata=list(origin=age.grid),se=T) 
+lines(age.grid, pred2$fit,col="red",lwd=2)  
+```
+
+### 9 
+
+This question uses the variables dis (the weighted mean of distances to five Boston employment centers) and nox (nitrogen oxides concen- tration in parts per 10 million) from the Boston data. We will treat dis as the predictor and nox as the response.
+
+(a) Use the poly() function to fit a cubic polynomial regression to predict nox using dis. Report the regression output, and plot the resulting data and polynomial fits.
+
+```{r}
+library(MASS)
+colnames(Boston)
+
+fit=lm(nox~poly(dis,3),data=Boston) 
+summary(fit) 
+
+lims=range(Boston$dis)
+grid=seq(from=lims[1],to=lims[2])
+preds=predict(fit,newdata=list(dis=grid),se=TRUE) # predict
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit ) # predict +/- 2se
+
+plot(Boston$dis,Boston$nox,xlim=lims ,cex=.5,col="darkgrey") # plot the value
+title("Degree -3 Polynomial ",outer=T) # title 
+lines(grid,preds$fit,lwd=2,col="blue") # add fit line 
+matlines(grid,se.bands,lwd=1,col="blue",lty=3) # add CI line  
+```
+
+(b) Plot the polynomial fits for a range of different polynomial degrees (say, from 1 to 10), and report the associated residual sum of squares.
+
+```{r}
+# what is rss? residual: the difference between the ith observed response value and the ith response value that is predicted by our linear model. RSS is sum of squares of residuals 
+set.seed(1)
+cv.error.10=rep(0,10) 
+for (i in 1:10){
+glm.fit=glm(nox~poly(dis ,i),data=Boston) 
+cv.error.10[i]= sum((Boston$nox-predict(glm.fit, Boston))^2) 
+} 
+cv.error.10  
+plot(cv.error.10) # degree of 3 
+```
+
+(c) Perform cross-validation or another approach to select the opti- mal degree for the polynomial, and explain your results.
+
+```{r}
+cv.error=rep(0,5) 
+for (i in 1:5){
+glm.fit=glm(nox~poly(dis ,i),data=Boston) # different polynomial levels 
+cv.error[i]=cv.glm(Boston,glm.fit, K=10)$delta[1]}  
+cv.error  
+plot(cv.error) # degree of 3 
+```
+
+I will stop here. 
+
+(d) Use the bs() function to fit a regression spline to predict nox using dis. Report the output for the fit using four degrees of freedom. How did you choose the knots? Plot the resulting fit.
+
+```{r}
+```
+
+(e) Now fit a regression spline for a range of degrees of freedom, and plot the resulting fits and report the resulting RSS. Describe the results obtained.
+
+(f) Perform cross-validation or another approach in order to select the best degrees of freedom for a regression spline on this data. Describe your results.
