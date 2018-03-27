@@ -60,6 +60,41 @@ library(ISLR)
 ```
 
 ```r
+library(gam)
+```
+
+```
+## Warning: package 'gam' was built under R version 3.2.5
+```
+
+```
+## Loading required package: splines
+```
+
+```
+## Loading required package: foreach
+```
+
+```
+## Warning: package 'foreach' was built under R version 3.2.5
+```
+
+```
+## 
+## Attaching package: 'foreach'
+```
+
+```
+## The following objects are masked from 'package:purrr':
+## 
+##     accumulate, when
+```
+
+```
+## Loaded gam 1.14-4
+```
+
+```r
 # fit model with different degrees, and use anova 
 fit.1=lm(wage~age,data=Wage)
 fit.2=lm(wage~poly(age,2),data=Wage) 
@@ -298,83 +333,36 @@ legend("topright",legend=c("Span=0.5","Span=0.8"), col=c("red","blue"),lty=1,lwd
 ```r
 # GAM, can replace  
 gam.m1=gam(wage~s(age ,5)+maritl ,data=Wage) # model that exclude year 
-```
-
-```
-## Error in eval(expr, envir, enclos): could not find function "gam"
-```
-
-```r
 gam.m2=gam(wage~year+s(age ,5)+maritl ,data=Wage) # model that use linear function 
-```
-
-```
-## Error in eval(expr, envir, enclos): could not find function "gam"
-```
-
-```r
 gam.m3=gam(wage~s(year ,4)+s(age ,5)+maritl ,data=Wage)
-```
 
-```
-## Error in eval(expr, envir, enclos): could not find function "gam"
-```
-
-```r
 anova(gam.m1,gam.m2,gam.m3,test="F") 
 ```
 
 ```
-## Error in anova(gam.m1, gam.m2, gam.m3, test = "F"): object 'gam.m1' not found
+## Analysis of Deviance Table
+## 
+## Model 1: wage ~ s(age, 5) + maritl
+## Model 2: wage ~ year + s(age, 5) + maritl
+## Model 3: wage ~ s(year, 4) + s(age, 5) + maritl
+##   Resid. Df Resid. Dev Df Deviance       F    Pr(>F)    
+## 1      2993    4757094                                  
+## 2      2992    4735104  1  21989.3 13.8905 0.0001974 ***
+## 3      2989    4731727  3   3377.3  0.7111 0.5452564    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ```r
 plot.gam(gam.m2, se=TRUE,col="blue")  
 ```
 
-```
-## Error in eval(expr, envir, enclos): could not find function "plot.gam"
-```
+![](polynomial_step_piecewise_polynomial_files/figure-html/unnamed-chunk-3-5.png)<!-- -->![](polynomial_step_piecewise_polynomial_files/figure-html/unnamed-chunk-3-6.png)<!-- -->![](polynomial_step_piecewise_polynomial_files/figure-html/unnamed-chunk-3-7.png)<!-- -->
 
 ### 8 
 
 Fit some of the non-linear models investigated in this chapter to the Auto data set. Is there evidence for non-linear relationships in this data set? Create some informative plots to justify your answer.
 
-
-```r
-library(gam)
-```
-
-```
-## Warning: package 'gam' was built under R version 3.2.5
-```
-
-```
-## Loading required package: splines
-```
-
-```
-## Loading required package: foreach
-```
-
-```
-## Warning: package 'foreach' was built under R version 3.2.5
-```
-
-```
-## 
-## Attaching package: 'foreach'
-```
-
-```
-## The following objects are masked from 'package:purrr':
-## 
-##     accumulate, when
-```
-
-```
-## Loaded gam 1.14-4
-```
 
 ```r
 colnames(Auto) 

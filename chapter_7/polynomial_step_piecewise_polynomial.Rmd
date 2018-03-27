@@ -16,6 +16,7 @@ output:
 ```{r}
 library(tidyverse)
 library(ISLR)
+library(gam)
 
 # fit model with different degrees, and use anova 
 fit.1=lm(wage~age,data=Wage)
@@ -137,7 +138,6 @@ plot.gam(gam.m2, se=TRUE,col="blue")
 Fit some of the non-linear models investigated in this chapter to the Auto data set. Is there evidence for non-linear relationships in this data set? Create some informative plots to justify your answer.
 
 ```{r}
-library(gam)
 colnames(Auto) 
 
 # I would like to invesitigate the relationship between origin and mpg, hypothesis, Japanese car has a higher mpg, origin matters 
