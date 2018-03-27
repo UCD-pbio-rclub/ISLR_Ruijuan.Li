@@ -725,7 +725,49 @@ legend("topright",legend=c("16 DF","6.8 DF"),
 col=c("red","blue"),lty=1,lwd=2,cex=.8) # add legend 
 
 # local regression, loess(), to be continued... 
- 
+plot(Wage$age,Wage$wage,xlim=agelims ,cex=.5,col="darkgrey")
+title (" Local Regression ")
+fit=loess(wage~age,span=.2,data=Wage)
+fit2=loess(wage~age,span=.5,data=Wage)
+lines(age.grid,predict(fit,data.frame(age=age.grid)), col="red",lwd=2)
+lines(age.grid,predict(fit2,data.frame(age=age.grid)), col="blue",lwd=2)
+legend("topright",legend=c("Span=0.2","Span=0.5"), col=c("red","blue"),lty=1,lwd=2,cex=.8) 
+
+# GAM 
+gam1=lm(wage~ns(year ,4)+ns(age ,5)+education ,data=Wage) # 4 & 5 are degree of freedom
+
+library("gam")
+gam.m3=gam(wage~s(year ,4)+s(age ,5)+education ,data=Wage)
+
+par(mfrow=c(1,3))
+plot(gam.m3, se=TRUE,col="blue")
+
+plot.gam(gam1, se=TRUE, col="red")
+
+gam.m1=gam(wage~s(age ,5)+education ,data=Wage) # model that exclude year 
+gam.m2=gam(wage~year+s(age ,5)+education ,data=Wage) # model that use linear function  
+anova(gam.m1,gam.m2,gam.m3,test="F") 
+summary(gam.m3)
+
+preds=predict(gam.m2,newdata=Wage)
+
+gam.lo=gam(wage~s(year,df=4)+lo(age,span=0.7)+education, data=Wage)
+plot.gam(gam.lo, se=TRUE, col="green")
+
+gam.lo.i=gam(wage~lo(year,age,span=0.5)+education,data=Wage)
+
+library(akima)
+plot(gam.lo.i)
+
+gam.lr=gam(I(wage>250)~year+s(age,df=5)+education, family=binomial,data=Wage)
+par(mfrow=c(1,3))
+plot(gam.lr,se=T,col="green")
+
+table(Wage$education ,I(Wage$wage >250))
+
+gam.lr.s=gam(I(wage>250)~year+s(age,df=5)+education,family= binomial,data=Wage,subset=(education!="1. < HS Grad"))
+plot(gam.lr.s,se=T,col="green") 
+
 ```
 
 
