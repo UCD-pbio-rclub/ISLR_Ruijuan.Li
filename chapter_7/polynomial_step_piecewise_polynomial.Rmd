@@ -318,6 +318,6 @@ mean((test$Outstate-preds)^2)
 
 ```{r}
 # all of them? should use cross validation to select the best parameter for s() 
-summary(gam) # PhD & Expend 
+summary(gam) # Expend 
 ```
 

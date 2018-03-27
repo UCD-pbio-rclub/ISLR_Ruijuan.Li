@@ -684,7 +684,7 @@ mean((test$Outstate-preds)^2)  </code></pre>
 <li>For which variables, if any, is there evidence of a non-linear relationship with the response?</li>
 </ol>
 <pre class="r"><code># all of them? should use cross validation to select the best parameter for s() 
-summary(gam) # PhD &amp; Expend </code></pre>
+summary(gam) # Expend </code></pre>
 <pre><code>## 
 ## Call: gam(formula = Outstate ~ s(P.Undergrad, 4) + s(PhD, 5) + s(perc.alumni, 
 ##     5) + s(Expend, 5) + Private, data = train)
