@@ -60,7 +60,7 @@ library(ISLR)
 ```
 
 ```r
-library(gam)
+library(gam) 
 ```
 
 ```
@@ -228,7 +228,7 @@ pairs(Wage)
 ![](polynomial_step_piecewise_polynomial_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 ```r
-Wage$maritl <- as.numeric(Wage$maritl)
+Wage$maritl <- as.numeric(Wage$maritl)  
 # use maritial status to predict wage, categorical predictor, I decided to use step function  
 table(cut(Wage$maritl,4)) # cut pick cutpoint automatically or specify cut point using breaks 
 ```
@@ -913,5 +913,45 @@ mean((test$Outstate-preds)^2)
 
 ```r
 # all of them? should use cross validation to select the best parameter for s() 
+summary(gam) # PhD & Expend 
+```
+
+```
+## 
+## Call: gam(formula = Outstate ~ s(P.Undergrad, 4) + s(PhD, 5) + s(perc.alumni, 
+##     5) + s(Expend, 5) + Private, data = train)
+## Deviance Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -9047.9 -1247.0   205.4  1318.7  6244.4 
+## 
+## (Dispersion Parameter for gaussian family taken to be 4062307)
+## 
+##     Null Deviance: 9754133995 on 621 degrees of freedom
+## Residual Deviance: 2441445938 on 600.9999 degrees of freedom
+## AIC: 11252.93 
+## 
+## Number of Local Scoring Iterations: 2 
+## 
+## Anova for Parametric Effects
+##                    Df     Sum Sq    Mean Sq F value    Pr(>F)    
+## s(P.Undergrad, 4)   1  658172419  658172419  162.02 < 2.2e-16 ***
+## s(PhD, 5)           1 1254444383 1254444383  308.80 < 2.2e-16 ***
+## s(perc.alumni, 5)   1 1153553473 1153553473  283.97 < 2.2e-16 ***
+## s(Expend, 5)        1 2054526871 2054526871  505.75 < 2.2e-16 ***
+## Private             1  788358352  788358352  194.07 < 2.2e-16 ***
+## Residuals         601 2441445938    4062307                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Anova for Nonparametric Effects
+##                   Npar Df Npar F   Pr(F)    
+## (Intercept)                                 
+## s(P.Undergrad, 4)       3  2.404 0.06649 .  
+## s(PhD, 5)               4  2.154 0.07284 .  
+## s(perc.alumni, 5)       4  2.285 0.05898 .  
+## s(Expend, 5)            4 35.617 < 2e-16 ***
+## Private                                     
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
