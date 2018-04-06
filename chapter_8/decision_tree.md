@@ -231,13 +231,20 @@ cv.carseats
 ```r
 par(mfrow=c(1,2))
 plot(cv.carseats$size ,cv.carseats$dev ,type='b')
-plot(cv.carseats$size ,cv.carseats$k ,type='b') # size 10 gave the smallest CV error 
+plot(cv.carseats$size ,cv.carseats$k ,type='b') # size 13 gave the smallest CV error 
 ```
 
 ![](decision_tree_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ```r
-# the last one with teminal node # of 10 gave the smallest CV error.  
+# 
+prune.carseats=prune.tree(tree.carseats,best=13)
+tree.pred=predict(prune.carseats,test)
+mean((tree.pred - test$Sales)^2) 
+```
+
+```
+## [1] 4.891394
 ```
 
 ### 9 
