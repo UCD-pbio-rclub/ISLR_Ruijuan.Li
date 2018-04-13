@@ -103,7 +103,7 @@ set.seed(2)
 cv.carseats =cv.tree(tree.carseats)
 cv.carseats
 par(mfrow=c(1,2))
-plot(cv.carseats$size ,cv.carseats$dev ,type='b')
+plot(cv.carseats$size ,cv.carseats$dev ,type='b') 
 plot(cv.carseats$size ,cv.carseats$k ,type='b') # size 13 gave the smallest CV error 
 
 # 
@@ -195,3 +195,254 @@ table(tree.pred ,OJ.test$Purchase)
 (k) Compare the test error rates between the pruned and unpruned trees. Which is higher? 
 
 same ... 
+
+### bagging, random forest, and boosting 
+
+### 5
+
+Suppose we produce ten bootstrapped samples from a data set containing red and green classes. We then apply a classification tree to each bootstrapped sample and, for a specific value of X, produce 10 estimates of P(Class is Red|X):
+0.1, 0.15, 0.2, 0.2, 0.55, 0.6, 0.6, 0.65, 0.7, and 0.75.
+
+There are two common ways to combine these results together into a single class prediction. One is the majority vote approach discussed in this chapter. The second approach is to classify based on the average probability. In this example, what is the final classification under each of these two approaches?
+
+```{r}
+P <- c(0.1, 0.15, 0.2, 0.2, 0.55, 0.6, 0.6, 0.65, 0.7, 0.75)
+
+# majority vote
+sum(P < 0.5)/length(P) # less than 0.5, so green 
+# average 
+mean(P) # less than 0.5 as well, green 
+```
+
+### 7
+
+In the lab, we applied random forests to the Boston data using mtry=6 and using ntree=25 and ntree=500. Create a plot displaying the test error resulting from random forests on this data set for a more com- prehensive range of values for mtry and ntree. You can model your plot after Figure 8.10. Describe the results obtained.
+
+```{r}
+library(randomForest)
+set.seed(1)
+train = sample(1:nrow(Boston), nrow(Boston)/2)
+boston.test=Boston[-train ,"medv"]
+
+mtry <- c(ncol(Boston)-1, round((ncol(Boston)-1)/2, digits = 0), round(sqrt(ncol(Boston)-1), digits = 0))
+ntree <- seq(1,500, by = 20)
+
+output <- 
+sapply(mtry, function(i){
+sapply(ntree, function(j) {
+  bag.boston=randomForest(medv~.,data=Boston,subset=train,mtry=i,importance =TRUE, ntree=j) 
+  yhat.bag = predict(bag.boston ,newdata=Boston[-train,])
+  mean((yhat.bag-boston.test)^2)
+})
+})
+
+output <- as.data.frame(output) 
+colnames(output) <- mtry
+output$ntree <- ntree
+
+library(tidyverse)
+
+output %>% 
+  gather(`13`, `6`, `4`, key = "mtry", value = "MSE") %>% 
+  ggplot(aes(x = ntree, y = MSE, group = mtry)) + 
+  geom_line(aes(color = mtry))   
+```
+
+### 8 d,e
+
+(d) Use the bagging approach in order to analyze this data. What test MSE do you obtain? Use the importance() function to de- termine which variables are most important.
+
+```{r}
+train_ID <- sample(rownames(Carseats), size = round(nrow(Carseats) * 0.8), replace = F) 
+train <- Carseats[rownames(Carseats) %in% train_ID,]
+test <- Carseats[!(rownames(Carseats) %in% train_ID),]
+
+colnames(Carseats)
+
+colnames(Carseats)
+set.seed (1)
+bag.carseats=randomForest(Sales~.,data=train,mtry=ncol(Carseats)-1,importance =TRUE)
+
+yhat.bag = predict(bag.carseats,newdata=test)
+mean((yhat.bag-test$Sales)^2) 
+
+importance(bag.carseats) 
+varImpPlot(bag.carseats)   
+```
+
+(e) Use random forests to analyze this data. What test MSE do you obtain? Use the importance() function to determine which vari- ables are most important. Describe the effect of m, the number of variables considered at each split, on the error rate obtained. 
+
+```{r}
+mtry <- (2:(ncol(Carseats)-1))
+mtry
+
+output <- 
+sapply(mtry, function(i){
+  rf.carseats=randomForest(Sales~.,data=train,mtry=i,importance =TRUE) 
+  yhat.rf = predict(rf.carseats ,newdata=test)
+  mean((yhat.rf-test$Sales)^2)
+})
+
+output <- as.data.frame(output)
+output$mtry <- mtry
+output %>% 
+  ggplot() + 
+  geom_point(aes(x = mtry, y = output)) + 
+  labs(x = "mtry", y = "MSE") 
+```
+
+### 10
+
+10. We now use boosting to predict Salary in the Hitters data set.
+
+(a) Remove the observations for whom the salary information is unknown, and then log-transform the salaries.
+
+```{r}
+colnames(Hitters)
+dim(Hitters)
+
+Hitters <- Hitters[!is.na(Hitters$Salary),] 
+dim(Hitters)
+
+Hitters$Salary_log <- log(Hitters$Salary) 
+```
+
+(b) Create a training set consisting of the first 200 observations, and a test set consisting of the remaining observations.
+
+```{r}
+train_ID <- rownames(Hitters)[1:200] 
+train <- Hitters[rownames(Hitters) %in% train_ID,]
+test <- Hitters[!(rownames(Hitters) %in% train_ID),]
+train %>% dim()
+```
+
+(c) Perform boosting on the training set with 1,000 trees for a range of values of the shrinkage parameter λ. Produce a plot with different shrinkage values on the x-axis and the corresponding training set MSE on the y-axis.
+
+```{r}
+library(gbm)
+set.seed(1)
+shrinkage <- seq(0.001, 1, length.out = 20)
+shrinkage 
+
+output <- 
+sapply(shrinkage, function(i){
+  boost.Hitter=gbm(Salary_log~.-Salary,data=train,distribution="gaussian",n.trees=1000, interaction.depth=4, shrinkage =i)
+  yhat.boost=predict(boost.Hitter,newdata=test, n.trees=1000)
+  mean((yhat.boost -test$Salary_log)^2) 
+}) 
+
+output <- as.data.frame(output)  
+output$shrinkage <- shrinkage
+```
+
+(d) Produce a plot with different shrinkage values on the x-axis and the corresponding test set MSE on the y-axis.
+
+```{r}
+output %>%  
+  ggplot() + 
+  geom_point(aes(x = shrinkage, y = output)) + 
+  labs(x = "shrinkage", y = "MSE") 
+```
+
+(e) Compare the test MSE of boosting to the test MSE that results from applying two of the regression approaches seen in Chapters 3 and 6.
+
+```{r}
+# multiple linear regression 
+fit.m1 <- lm(Salary_log ~ .-Salary, data = train)
+summary(fit.m1)
+
+fit.m2 <- lm(Salary_log ~ Walks + Division + League, data = train)
+yhat.fit=predict(fit.m2,newdata=test)
+mean((yhat.fit -test$Salary_log)^2) 
+
+# bestsubset  
+library(leaps)
+
+colnames(Hitters)
+regfit.Hitter=regsubsets(Salary_log~.-Salary,data=train, nvmax =19) # best subset using only traning data 
+plot(regfit.Hitter,scale="bic") # 5 predictor is the best 
+
+test.Hitter<-model.matrix(Salary_log~.-Salary,data=test) 
+dim(test.Hitter) 
+dim(test)
+
+val.errors=rep(NA,19) 
+
+for(i in 1:19){
+coefi=coef(regfit.Hitter,id=i)
+pred=test.Hitter[,names(coefi)]%*%coefi
+val.errors[i]=mean((test$Salary_log-pred)^2) }
+
+val.errors
+min <- which.min(val.errors) # 9 predictors  
+min
+val.errors[min]  
+``` 
+
+(f) Which variables appear to be the most important predictors in the boosted model?
+
+```{r}
+set.seed(1)
+boost.Hitter=gbm(Salary_log~.-Salary,data=train,distribution="gaussian",n.trees=5000, interaction.depth=4)
+
+summary(boost.Hitter)
+```
+
+(g) Now apply bagging to the training set. What is the test set MSE for this approach?
+
+```{r}
+set.seed(1)
+colnames(Hitters) 
+bag.Hitter=randomForest(Salary_log~.-Salary,data=train,mtry=19,importance =TRUE)
+bag.Hitter
+
+yhat.bag = predict(bag.Hitter ,newdata=test)
+mean((yhat.bag-test$Salary_log)^2)
+```
+
+### 11
+
+11. This question uses the Caravan data set. 
+
+(a) Create a training set consisting of the first 1,000 observations,
+and a test set consisting of the remaining observations.
+
+```{r}
+colnames(Caravan)
+dim(Caravan)
+Caravan$Purchase_2 <- ifelse(Caravan$Purchase == "Yes", 1, 0)
+
+train_ID <- rownames(Caravan)[1:1000]
+train <- Caravan[rownames(Caravan) %in% train_ID,]
+test <- Caravan[!(rownames(Caravan) %in% train_ID),]
+train %>% dim() 
+```
+
+(b) Fit a boosting model to the training set with Purchase as the response and the other variables as predictors. Use 1,000 trees, and a shrinkage value of 0.01. Which predictors appear to be the most important?
+
+```{r}
+boost.Caravan=gbm(Purchase_2~.-Purchase,data=train,distribution= "bernoulli",n.trees=1000, interaction.depth=4,shrinkage =0.01, verbose =F)
+summary(boost.Caravan) # the top ones  
+```
+
+(c) Use the boosting model to predict the response on the test data. Predict that a person will make a purchase if the estimated prob- ability of purchase is greater than 20 %. Form a confusion ma- trix. What fraction of the people predicted to make a purchase do in fact make one? How does this compare with the results obtained from applying KNN or logistic regression to this data set? 
+
+```{r}
+library(class) 
+### boosting model   
+yhat.boost=predict(boost.Caravan,newdata=test, n.trees=1000, type = "response")
+yhat.boost <- ifelse(yhat.boost > 0.2, 1, 0)
+table(yhat.boost, test$Purchase_2)
+30/(30+259) # why so low. 
+
+### logistic
+glm.fits=glm(Purchase_2 ~ .-Purchase, data=train,family=binomial) 
+glm.probs=predict(glm.fits,test,type="response")
+glm.probs <- ifelse(glm.probs > 0.2, 1, 0)
+table(glm.probs, test$Purchase_2)
+58/(58+231) # higher but still very low 
+```
+
+### 12 (will skip) 
+
+Apply boosting, bagging, and random forests to a data set of your choice. Be sure to fit the models on a training set and to evaluate their performance on a test set. How accurate are the results compared to simple methods like linear or logistic regression? Which of these approaches yields the best performance? 
