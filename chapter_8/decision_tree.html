@@ -400,8 +400,8 @@ table(tree.pred ,OJ.test$Purchase)</code></pre>
 <pre class="r"><code>P &lt;- c(0.1, 0.15, 0.2, 0.2, 0.55, 0.6, 0.6, 0.65, 0.7, 0.75)
 
 # majority vote
-sum(P &lt; 0.5)/length(P) # less than 0.5, so green </code></pre>
-<pre><code>## [1] 0.4</code></pre>
+sum(P &gt; 0.5)/length(P) # greater than 0.5, so red</code></pre>
+<pre><code>## [1] 0.6</code></pre>
 <pre class="r"><code># average 
 mean(P) # less than 0.5 as well, green </code></pre>
 <pre><code>## [1] 0.45</code></pre>
