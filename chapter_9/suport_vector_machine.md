@@ -547,8 +547,8 @@ dim(Auto)
 ```r
 set.seed(1)
 train <- sample(392, 392*0.8)
-tune.out1=tune(svm,y~.,data=Auto[train,],kernel="linear",ranges=list(cost=c(0.001, 0.01, 0.1, 1,5,10,100)))
-summary(tune.out1)  # best is with 0.075
+tune.out1=tune(svm,y~.-mpg,data=Auto[train,],kernel="linear",ranges=list(cost=c(0.001, 0.01, 0.1, 1,5,10,100)))
+summary(tune.out1) 
 ```
 
 ```
@@ -561,17 +561,17 @@ summary(tune.out1)  # best is with 0.075
 ##  cost
 ##     1
 ## 
-## - best performance: 0.07587471 
+## - best performance: 0.1006754 
 ## 
 ## - Detailed performance results:
-##    cost      error dispersion
-## 1 1e-03 0.10024058 0.02179633
-## 2 1e-02 0.08549502 0.02452468
-## 3 1e-01 0.08046756 0.02410481
-## 4 1e+00 0.07587471 0.02218601
-## 5 5e+00 0.08296032 0.02451379
-## 6 1e+01 0.08904159 0.02621574
-## 7 1e+02 0.10433531 0.03542994
+##    cost     error dispersion
+## 1 1e-03 0.1169002 0.02558848
+## 2 1e-02 0.1109205 0.02955056
+## 3 1e-01 0.1089096 0.03002889
+## 4 1e+00 0.1006754 0.02383325
+## 5 5e+00 0.1039840 0.02709341
+## 6 1e+01 0.1066795 0.02799805
+## 7 1e+02 0.1205500 0.03329877
 ```
 
 ```r
@@ -581,8 +581,8 @@ tune.out1$best.model
 ```
 ## 
 ## Call:
-## best.tune(method = svm, train.x = y ~ ., data = Auto[train, ], 
-##     ranges = list(cost = c(0.001, 0.01, 0.1, 1, 5, 10, 100)), 
+## best.tune(method = svm, train.x = y ~ . - mpg, data = Auto[train, 
+##     ], ranges = list(cost = c(0.001, 0.01, 0.1, 1, 5, 10, 100)), 
 ##     kernel = "linear")
 ## 
 ## 
@@ -590,11 +590,11 @@ tune.out1$best.model
 ##    SVM-Type:  eps-regression 
 ##  SVM-Kernel:  linear 
 ##        cost:  1 
-##       gamma:  0.003205128 
+##       gamma:  0.003215434 
 ##     epsilon:  0.1 
 ## 
 ## 
-## Number of Support Vectors:  261
+## Number of Support Vectors:  253
 ```
 
 (c) Now repeat (b), this time using SVMs with radial and polynomial basis kernels, with different values of gamma and degree and cost. Comment on your results.
@@ -602,8 +602,8 @@ tune.out1$best.model
 ```r
 # radial 
 set.seed(1)
-tune.out2=tune(svm, y~., data=Auto[train,], kernel="radial",ranges=list(cost=c(0.1,1,10,100,1000),gamma=c(0.5,1,2,3,4) ))
-summary(tune.out2) # 0.052
+tune.out2=tune(svm, y~.-mpg, data=Auto[train,], kernel="radial",ranges=list(cost=c(0.1,1,10,100,1000),gamma=c(0.5,1,2,3,4) ))
+summary(tune.out2) 
 ```
 
 ```
@@ -616,35 +616,35 @@ summary(tune.out2) # 0.052
 ##  cost gamma
 ##     1   0.5
 ## 
-## - best performance: 0.05185402 
+## - best performance: 0.06604259 
 ## 
 ## - Detailed performance results:
 ##     cost gamma      error  dispersion
-## 1  1e-01   0.5 0.08956250 0.020328091
-## 2  1e+00   0.5 0.05185402 0.019300701
-## 3  1e+01   0.5 0.05444809 0.020004784
-## 4  1e+02   0.5 0.05440952 0.019873212
-## 5  1e+03   0.5 0.05440952 0.019873212
-## 6  1e-01   1.0 0.29833830 0.045594412
-## 7  1e+00   1.0 0.10569149 0.017702338
-## 8  1e+01   1.0 0.10820856 0.019155256
-## 9  1e+02   1.0 0.10820856 0.019155256
-## 10 1e+03   1.0 0.10820856 0.019155256
-## 11 1e-01   2.0 0.38644055 0.063495741
-## 12 1e+00   2.0 0.21223559 0.009025986
-## 13 1e+01   2.0 0.21278064 0.009302493
-## 14 1e+02   2.0 0.21278064 0.009302493
-## 15 1e+03   2.0 0.21278064 0.009302493
-## 16 1e-01   3.0 0.39238426 0.064471850
-## 17 1e+00   3.0 0.23272357 0.007407253
-## 18 1e+01   3.0 0.23283600 0.007396949
-## 19 1e+02   3.0 0.23283600 0.007396949
-## 20 1e+03   3.0 0.23283600 0.007396949
-## 21 1e-01   4.0 0.39334840 0.064761426
-## 22 1e+00   4.0 0.23681328 0.006531466
-## 23 1e+01   4.0 0.23683382 0.006515919
-## 24 1e+02   4.0 0.23683382 0.006515919
-## 25 1e+03   4.0 0.23683382 0.006515919
+## 1  1e-01   0.5 0.09307622 0.026833735
+## 2  1e+00   0.5 0.06604259 0.029843375
+## 3  1e+01   0.5 0.07227406 0.036208621
+## 4  1e+02   0.5 0.07804374 0.040298461
+## 5  1e+03   0.5 0.07804374 0.040298461
+## 6  1e-01   1.0 0.28651288 0.043442876
+## 7  1e+00   1.0 0.10535064 0.022386076
+## 8  1e+01   1.0 0.11175282 0.027418721
+## 9  1e+02   1.0 0.11175238 0.027419431
+## 10 1e+03   1.0 0.11175238 0.027419431
+## 11 1e-01   2.0 0.38461563 0.063136134
+## 12 1e+00   2.0 0.20829460 0.009919853
+## 13 1e+01   2.0 0.20952206 0.010854953
+## 14 1e+02   2.0 0.20952206 0.010854953
+## 15 1e+03   2.0 0.20952206 0.010854953
+## 16 1e-01   3.0 0.39191369 0.064179519
+## 17 1e+00   3.0 0.23151207 0.008021795
+## 18 1e+01   3.0 0.23177774 0.007999518
+## 19 1e+02   3.0 0.23177774 0.007999518
+## 20 1e+03   3.0 0.23177774 0.007999518
+## 21 1e-01   4.0 0.39305500 0.064434788
+## 22 1e+00   4.0 0.23581811 0.007018306
+## 23 1e+01   4.0 0.23589345 0.006952151
+## 24 1e+02   4.0 0.23589345 0.006952151
+## 25 1e+03   4.0 0.23589345 0.006952151
 ```
 
 ```r
@@ -654,9 +654,9 @@ tune.out2$best.model
 ```
 ## 
 ## Call:
-## best.tune(method = svm, train.x = y ~ ., data = Auto[train, ], 
-##     ranges = list(cost = c(0.1, 1, 10, 100, 1000), gamma = c(0.5, 
-##         1, 2, 3, 4)), kernel = "radial")
+## best.tune(method = svm, train.x = y ~ . - mpg, data = Auto[train, 
+##     ], ranges = list(cost = c(0.1, 1, 10, 100, 1000), gamma = c(0.5, 
+##     1, 2, 3, 4)), kernel = "radial")
 ## 
 ## 
 ## Parameters:
@@ -667,13 +667,13 @@ tune.out2$best.model
 ##     epsilon:  0.1 
 ## 
 ## 
-## Number of Support Vectors:  236
+## Number of Support Vectors:  234
 ```
 
 ```r
 # poly 
-tune.out3=tune(svm, y~., data=Auto[train,], kernel="poly",ranges=list(cost=c(0.1,1,10,100,1000),degree=c(2,3,4)))
-summary(tune.out3) # 0.15
+tune.out3=tune(svm, y~.-mpg, data=Auto[train,], kernel="poly",ranges=list(cost=c(0.1,1,10,100,1000),degree=c(2,3,4)))
+summary(tune.out3)  
 ```
 
 ```
@@ -684,67 +684,62 @@ summary(tune.out3) # 0.15
 ## 
 ## - best parameters:
 ##  cost degree
-##  1000      3
+##  1000      2
 ## 
-## - best performance: 0.1506076 
+## - best performance: 0.1628445 
 ## 
 ## - Detailed performance results:
 ##     cost degree     error dispersion
-## 1  1e-01      2 0.4667055 0.06829165
-## 2  1e+00      2 0.4566331 0.07247091
-## 3  1e+01      2 0.3770810 0.09263398
-## 4  1e+02      2 0.2399638 0.04938827
-## 5  1e+03      2 0.1583750 0.02921011
-## 6  1e-01      3 0.4672495 0.06783804
-## 7  1e+00      3 0.4617283 0.06821940
-## 8  1e+01      3 0.4099117 0.07058503
-## 9  1e+02      3 0.1993490 0.03684104
-## 10 1e+03      3 0.1506076 0.03060119
-## 11 1e-01      4 0.4678574 0.06779994
-## 12 1e+00      4 0.4677729 0.06785149
-## 13 1e+01      4 0.4669717 0.06839371
-## 14 1e+02      4 0.4590837 0.07357824
-## 15 1e+03      4 0.3972625 0.10107148
+## 1  1e-01      2 0.4666083 0.06827711
+## 2  1e+00      2 0.4560773 0.07237260
+## 3  1e+01      2 0.3724905 0.09147222
+## 4  1e+02      2 0.2522514 0.05673007
+## 5  1e+03      2 0.1628445 0.03231387
+## 6  1e-01      3 0.4674635 0.06786389
+## 7  1e+00      3 0.4638503 0.06848090
+## 8  1e+01      3 0.4293140 0.07360432
+## 9  1e+02      3 0.2413236 0.05167633
+## 10 1e+03      3 0.1750491 0.03579203
+## 11 1e-01      4 0.4678592 0.06779862
+## 12 1e+00      4 0.4677914 0.06783836
+## 13 1e+01      4 0.4671525 0.06826009
+## 14 1e+02      4 0.4608314 0.07233481
+## 15 1e+03      4 0.4082949 0.09843106
 ```
 
 ```r
-tune.out3$best.model
+tune.out3$best.model 
 ```
 
 ```
 ## 
 ## Call:
-## best.tune(method = svm, train.x = y ~ ., data = Auto[train, ], 
-##     ranges = list(cost = c(0.1, 1, 10, 100, 1000), degree = c(2, 
-##         3, 4)), kernel = "poly")
+## best.tune(method = svm, train.x = y ~ . - mpg, data = Auto[train, 
+##     ], ranges = list(cost = c(0.1, 1, 10, 100, 1000), degree = c(2, 
+##     3, 4)), kernel = "poly")
 ## 
 ## 
 ## Parameters:
 ##    SVM-Type:  eps-regression 
 ##  SVM-Kernel:  polynomial 
 ##        cost:  1000 
-##      degree:  3 
-##       gamma:  0.003205128 
+##      degree:  2 
+##       gamma:  0.003215434 
 ##      coef.0:  0 
 ##     epsilon:  0.1 
 ## 
 ## 
-## Number of Support Vectors:  290
+## Number of Support Vectors:  283
 ```
 
 ```r
-# radial performs the best 
+# radial performs the best  
 ```
 
 (d) Make some plots to back up your assertions in (b) and (c).
 Hint: In the lab, we used the plot() function for svm objects only in cases with p = 2. When p > 2, you can use the plot() function to create plots displaying pairs of variables at a time. Essentially, instead of typing
 
 
-```r
-plot(tune.out1$best.model, dat)
-plot(tune.out2$best.model, dat)
-plot(tune.out3$best.model, dat)
-```
 
 where svmfit contains your fitted model and dat is a data frame containing your data, you can type
 

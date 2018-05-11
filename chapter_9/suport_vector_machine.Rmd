@@ -151,8 +151,8 @@ dim(Auto)
 ```{r}
 set.seed(1)
 train <- sample(392, 392*0.8)
-tune.out1=tune(svm,y~.,data=Auto[train,],kernel="linear",ranges=list(cost=c(0.001, 0.01, 0.1, 1,5,10,100)))
-summary(tune.out1)  # best is with 0.075
+tune.out1=tune(svm,y~.-mpg,data=Auto[train,],kernel="linear",ranges=list(cost=c(0.001, 0.01, 0.1, 1,5,10,100)))
+summary(tune.out1) 
 tune.out1$best.model 
 ```
 
@@ -160,25 +160,22 @@ tune.out1$best.model
 ```{r}
 # radial 
 set.seed(1)
-tune.out2=tune(svm, y~., data=Auto[train,], kernel="radial",ranges=list(cost=c(0.1,1,10,100,1000),gamma=c(0.5,1,2,3,4) ))
-summary(tune.out2) # 0.052
+tune.out2=tune(svm, y~.-mpg, data=Auto[train,], kernel="radial",ranges=list(cost=c(0.1,1,10,100,1000),gamma=c(0.5,1,2,3,4) ))
+summary(tune.out2) 
 tune.out2$best.model
 
 # poly 
-tune.out3=tune(svm, y~., data=Auto[train,], kernel="poly",ranges=list(cost=c(0.1,1,10,100,1000),degree=c(2,3,4)))
-summary(tune.out3) # 0.15
-tune.out3$best.model
+tune.out3=tune(svm, y~.-mpg, data=Auto[train,], kernel="poly",ranges=list(cost=c(0.1,1,10,100,1000),degree=c(2,3,4)))
+summary(tune.out3)  
+tune.out3$best.model 
 
-# radial performs the best 
+# radial performs the best  
 ```
 
 (d) Make some plots to back up your assertions in (b) and (c).
 Hint: In the lab, we used the plot() function for svm objects only in cases with p = 2. When p > 2, you can use the plot() function to create plots displaying pairs of variables at a time. Essentially, instead of typing
 
-```{r}
-plot(tune.out1$best.model, dat)
-plot(tune.out2$best.model, dat)
-plot(tune.out3$best.model, dat)
+```{r} 
 ```
 
 where svmfit contains your fitted model and dat is a data frame containing your data, you can type
