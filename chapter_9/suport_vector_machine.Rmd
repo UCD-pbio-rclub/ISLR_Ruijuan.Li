@@ -108,9 +108,7 @@ dat[train,] %>%
 ```
 
 (g) Fit a support vector classifier to the data with X1 and X2 as predictors. Obtain a class prediction for each training observation. Plot the observations, colored according to the predicted class labels.
-```{r}
-dat=data.frame(x=x, y=as.factor(y))
-
+```{r} 
 set.seed(1)
 tune.out=tune(svm,y~.,data=dat[train,],kernel="linear",ranges=list(cost=c(0.001, 0.01, 0.1, 1,5,10,100)))
 summary(tune.out) 
