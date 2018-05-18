@@ -73,20 +73,20 @@ dim(data)
 (b) Perform PCA on the 60 observations and plot the first two principal component score vectors. Use a different color to indicate the observations in each of the three classes. If the three classes appear separated in this plot, then continue on to part (c). If not, then return to part (a) and modify the simulation so that there is greater separation between the three classes. Do not continue to part (c) until the three classes show at least some separation in the first two principal component score vectors.
 
 ```{r}
-# pr.out=prcomp(data, scale=TRUE)  
-# pc <- 
-# pr.out$rotation %>% as.data.frame() %>% 
-#   dplyr::select(PC1, PC2)
-#   
-# data$class[1:20] <- rep("class1", 20)
-# data$class[21:40] <- rep("class2", 20)
-# data$class[41:60] <- rep("class3", 20)
-# 
-# pc$class <- data$class 
-# 
-# pc %>% 
-#   ggplot() +
-#   geom_point(aes(x = PC1, y = PC2, color = class))   
+pr.out=prcomp(data, scale=TRUE)
+pc <-
+pr.out$x %>% as.data.frame() %>%
+  dplyr::select(PC1, PC2)
+
+data$class[1:20] <- rep("class1", 20)
+data$class[21:40] <- rep("class2", 20)
+data$class[41:60] <- rep("class3", 20)
+
+pc$class <- data$class
+
+pc %>%
+  ggplot() +
+  geom_point(aes(x = PC1, y = PC2, color = class))
 ```
 
  
