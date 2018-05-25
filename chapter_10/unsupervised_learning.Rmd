@@ -215,9 +215,9 @@ Ex11 %>% dim()
 (b) Apply hierarchical clustering to the samples using correlation- based distance, and plot the dendrogram. Do the genes separate the samples into the two groups? Do your results depend on the type of linkage used?
 
 ```{r}
-hc.complete=hclust(as.dist(cor(Ex11)), method="complete")
-hc.average=hclust(as.dist(cor(Ex11)), method="average") 
-hc.single=hclust(as.dist(cor(Ex11)), method="single")
+hc.complete=hclust(as.dist(1-cor(t(Ex11))), method="complete")
+hc.average=hclust(as.dist(1-cor(t(Ex11))), method="average") 
+hc.single=hclust(as.dist(1-cor(t(Ex11))), method="single") 
 
 par(mfrow=c(1,3))
 plot(hc.complete,main="Complete Linkage", xlab="", sub="",
@@ -226,30 +226,19 @@ plot(hc.average , main="Average Linkage", xlab="", sub="",
 cex =.9)
 plot(hc.single , main="Single Linkage", xlab="", sub="",
 cex =.9)
-# yes, linkage has a big effect
+# yes, linkage has a big effect, and none of them has the right split 
 
-# if scale 
-Ex11.scale <- scale(Ex11)
-hc.complete=hclust(as.dist(cor(Ex11.scale)), method="complete")
-hc.average=hclust(as.dist(cor(Ex11.scale)), method="average") 
-hc.single=hclust(as.dist(cor(Ex11.scale)), method="single")
-
-par(mfrow=c(1,3))
-plot(hc.complete,main="Complete Linkage", xlab="", sub="",
-cex =.9)
-plot(hc.average , main="Average Linkage", xlab="", sub="",
-cex =.9)
-plot(hc.single , main="Single Linkage", xlab="", sub="",
-cex =.9)
-# compared to unscaled data, looks like the same result, so scale doesn't have effect on correlation based clustering.
+# scale doesn't have effect on correlation based clustering.
 ```
 
 (c) Your collaborator wants to know which genes differ the most across the two groups. Suggest a way to answer this question, and apply it here.
 
 ```{r}
-Ex11 %>% head()
+# two approaches: 
+# John did it by firstly doing PCA on the sample data, then check the 1st PC loading, extract the genes with the largest loading https://github.com/UCD-pbio-rclub/ISLR_John.Davis/blob/master/R-club-May-25/2018_05_25.md 
 
 
+# Julin did it by using lasso, and extract the top genes with the highest coefficient.  https://github.com/UCD-pbio-rclub/ISLR_Julin.Maloof/blob/master/chapter_10/Chapter_10.md
 ```
 
 
